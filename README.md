@@ -1,6 +1,5 @@
-<img src="linux/icons/tyrian-128.png" width="128" height="128" align="right" alt="OpenTyrian icon">
-
 # OpenTyrian
+<img src="linux/icons/tyrian-128.png" width="128" height="128" align="right" alt="OpenTyrian icon">
 
 [![Linux](https://github.com/pedrocatalao/opentyrian/actions/workflows/linux.yml/badge.svg)](https://github.com/pedrocatalao/opentyrian/actions/workflows/linux.yml)
 [![macOS](https://github.com/pedrocatalao/opentyrian/actions/workflows/macos.yml/badge.svg)](https://github.com/pedrocatalao/opentyrian/actions/workflows/macos.yml)
