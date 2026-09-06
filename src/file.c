@@ -78,8 +78,24 @@ bool findDataFiles(void)
 		return dataFileExists(filename);
 	}
 
+	// A "data" directory next to the executable (or inside the app bundle's
+	// Resources on macOS), so a self-contained distribution runs from any cwd.
+	static char *baseDataDirPath = NULL;
+	if (baseDataDirPath == NULL)
+	{
+		char *basePath = SDL_GetBasePath();
+		if (basePath != NULL)
+		{
+			size_t baseDataDirPathSize = strlen(basePath) + strlen("data") + 1;
+			baseDataDirPath = malloc(baseDataDirPathSize);
+			snprintf(baseDataDirPath, baseDataDirPathSize, "%sdata", basePath);
+			SDL_free(basePath);
+		}
+	}
+
 	const char *dataDirPaths[] =
 	{
+		baseDataDirPath,
 #ifdef TYRIAN_DIR
 		TYRIAN_DIR,
 #endif
