@@ -8,7 +8,8 @@ else
     TYRIAN_DIR = $(gamesdir)/tyrian
 endif
 
-WITH_NETWORK := true
+# true, false, or auto (true if pkg-config can find SDL2_net)
+WITH_NETWORK := auto
 
 ################################################################################
 
@@ -45,12 +46,24 @@ gamesdir ?= $(datadir)/games
 ###
 
 TARGET := opentyrian
+ifeq ($(PLATFORM), WIN32)
+    TARGET := opentyrian.exe
+endif
 
 SRCS := $(wildcard src/*.c)
 OBJS := $(SRCS:src/%.c=obj/%.o)
 DEPS := $(SRCS:src/%.c=obj/%.d)
 
 ###
+
+ifeq ($(WITH_NETWORK), auto)
+    ifeq ($(shell $(PKG_CONFIG) --exists SDL2_net 2>/dev/null && echo true), true)
+        WITH_NETWORK := true
+    else
+        WITH_NETWORK := false
+        $(info SDL2_net not found; building without network support)
+    endif
+endif
 
 ifeq ($(WITH_NETWORK), true)
     EXTRA_CPPFLAGS += -DWITH_NETWORK
@@ -62,12 +75,17 @@ ifneq ($(OPENTYRIAN_VERSION), )
     EXTRA_CPPFLAGS += -DOPENTYRIAN_VERSION='"$(OPENTYRIAN_VERSION)"'
 endif
 
+# -Wno-format-truncation only exists in GCC; Clang rejects it under -Werror
+ifeq ($(findstring clang, $(shell $(CC) --version 2>/dev/null)), )
+    WNO_FORMAT_TRUNCATION := -Wno-format-truncation
+endif
+
 CPPFLAGS ?= -MMD
 CPPFLAGS += -DNDEBUG
 CFLAGS ?= -pedantic \
           -Wall \
           -Wextra \
-          -Wno-format-truncation \
+          $(WNO_FORMAT_TRUNCATION) \
           -Wno-missing-field-initializers \
           -O2
 LDFLAGS ?=
