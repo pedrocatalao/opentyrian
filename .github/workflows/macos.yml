@@ -1,0 +1,52 @@
+name: macOS
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: write        # needed to attach assets on release events
+
+jobs:
+  build:
+    name: macOS (universal .app)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # git describe --tags for the version string
+      - name: Install build dependencies
+        run: brew install pkgconf sdl2 sdl2_net
+      - name: Compile check (debug, -Werror, Homebrew SDL2)
+        run: |
+          make -j"$(sysctl -n hw.ncpu)" debug
+          ./opentyrian --help
+      - name: Cache game data
+        uses: actions/cache@v4
+        with:
+          path: data
+          key: tyrian21-data-v1
+      - name: Build OpenTyrian.app (universal, bundled SDL2 + game data)
+        run: ./make_mac.sh
+      - name: Verify the bundle
+        run: |
+          lipo -archs build/OpenTyrian.app/Contents/MacOS/opentyrian | grep -q "x86_64 arm64"
+          test -f build/OpenTyrian.app/Contents/Resources/data/tyrian1.lvl
+          test -d build/OpenTyrian.app/Contents/Frameworks/SDL2.framework
+          # the binary must not reference Homebrew - only the bundled framework
+          if otool -L build/OpenTyrian.app/Contents/MacOS/opentyrian | grep -q /opt/homebrew; then exit 1; fi
+          build/OpenTyrian.app/Contents/MacOS/opentyrian --help
+      - name: Zip app (preserving symlinks)
+        run: cd build && zip -r -y opentyrian-macos-universal.zip OpenTyrian.app
+      - uses: actions/upload-artifact@v4
+        with:
+          name: opentyrian-macos-universal
+          path: build/opentyrian-macos-universal.zip
+      - name: Attach to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" build/opentyrian-macos-universal.zip --clobber
