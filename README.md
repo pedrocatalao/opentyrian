@@ -2,9 +2,9 @@
 
 # OpenTyrian
 
-[![Linux](https://github.com/opentyrian/opentyrian/actions/workflows/linux.yml/badge.svg)](https://github.com/opentyrian/opentyrian/actions/workflows/linux.yml)
-[![macOS](https://github.com/opentyrian/opentyrian/actions/workflows/macos.yml/badge.svg)](https://github.com/opentyrian/opentyrian/actions/workflows/macos.yml)
-[![Windows](https://github.com/opentyrian/opentyrian/actions/workflows/windows.yml/badge.svg)](https://github.com/opentyrian/opentyrian/actions/workflows/windows.yml)
+[![Linux](https://github.com/pedrocatalao/opentyrian/actions/workflows/linux.yml/badge.svg)](https://github.com/pedrocatalao/opentyrian/actions/workflows/linux.yml)
+[![macOS](https://github.com/pedrocatalao/opentyrian/actions/workflows/macos.yml/badge.svg)](https://github.com/pedrocatalao/opentyrian/actions/workflows/macos.yml)
+[![Windows](https://github.com/pedrocatalao/opentyrian/actions/workflows/windows.yml/badge.svg)](https://github.com/pedrocatalao/opentyrian/actions/workflows/windows.yml)
 
 OpenTyrian is an open-source port of the DOS game Tyrian.
 
