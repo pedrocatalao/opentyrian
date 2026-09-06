@@ -19,11 +19,16 @@
 #ifndef VIDEO_SCALE_H
 #define VIDEO_SCALE_H
 
-#include "opentyr.h"
-
 #include "SDL.h"
 
-typedef void (*ScalerFunction)(SDL_Surface *src, SDL_Texture *dst);
+#include "opentyr.h"
+#include "surface.h"
+#include "video.h"
+
+typedef void (*ScalerFunction)(Surface *src, SDL_Texture *dst);
+
+// Current palette for the scalers, maintained by video_sdl.c.
+extern Uint32 rgb_palette[256], yuv_palette[256];
 
 struct Scalers
 {
@@ -32,10 +37,6 @@ struct Scalers
 	const char *name;
 };
 
-extern uint scaler;
 extern const struct Scalers scalers[];
-extern const uint scalers_count;
-
-void set_scaler_by_name(const char *name);
 
 #endif /* VIDEO_SCALE_H */

@@ -59,9 +59,8 @@ void JE_darkenBackground(JE_word neat)  /* wild detail level */
 	}
 }
 
-void blit_background_row(SDL_Surface *surface, int x, int y, Uint8 **map)
+void blit_background_row(Surface *surface, int x, int y, Uint8 **map)
 {
-	assert(surface->format->BitsPerPixel == 8);
 	
 	Uint8 *pixels = (Uint8 *)surface->pixels + (y * surface->pitch) + x,
 	      *pixels_ll = (Uint8 *)surface->pixels,  // lower limit
@@ -105,9 +104,8 @@ void blit_background_row(SDL_Surface *surface, int x, int y, Uint8 **map)
 	}
 }
 
-void blit_background_row_blend(SDL_Surface *surface, int x, int y, Uint8 **map)
+void blit_background_row_blend(Surface *surface, int x, int y, Uint8 **map)
 {
-	assert(surface->format->BitsPerPixel == 8);
 	
 	Uint8 *pixels = (Uint8 *)surface->pixels + (y * surface->pitch) + x,
 	      *pixels_ll = (Uint8 *)surface->pixels,  // lower limit
@@ -151,9 +149,9 @@ void blit_background_row_blend(SDL_Surface *surface, int x, int y, Uint8 **map)
 	}
 }
 
-void draw_background_1(SDL_Surface *surface)
+void draw_background_1(Surface *surface)
 {
-	SDL_FillRect(surface, NULL, 0);
+	surface_fill_rect(surface, NULL, 0);
 	
 	Uint8 **map = (Uint8 **)mapYPos + mapXbpPos - 12;
 	
@@ -165,7 +163,7 @@ void draw_background_1(SDL_Surface *surface)
 	}
 }
 
-void draw_background_2(SDL_Surface *surface)
+void draw_background_2(Surface *surface)
 {
 	if (map2YDelayMax > 1 && backMove2 < 2)
 		backMove2 = (map2YDelay == 1) ? 1 : 0;
@@ -201,7 +199,7 @@ void draw_background_2(SDL_Surface *surface)
 	}
 }
 
-void draw_background_2_blend(SDL_Surface *surface)
+void draw_background_2_blend(Surface *surface)
 {
 	if (map2YDelayMax > 1 && backMove2 < 2)
 		backMove2 = (map2YDelay == 1) ? 1 : 0;
@@ -231,7 +229,7 @@ void draw_background_2_blend(SDL_Surface *surface)
 	}
 }
 
-void draw_background_3(SDL_Surface *surface)
+void draw_background_3(Surface *surface)
 {
 	/* Movement of background */
 	backPos3 += backMove3;
@@ -316,9 +314,8 @@ void JE_checkSmoothies(void)
 	anySmoothies = (processorType > 2 && (smoothies[1-1] || smoothies[2-1])) || (processorType > 1 && (smoothies[3-1] || smoothies[4-1] || smoothies[5-1]));
 }
 
-void lava_filter(SDL_Surface *dst, SDL_Surface *src)
+void lava_filter(Surface *dst, Surface *src)
 {
-	assert(src->format->BitsPerPixel == 8 && dst->format->BitsPerPixel == 8);
 	
 	/* we don't need to check for over-reading the pixel surfaces since we only
 	 * read from the top 185+1 scanlines, and there should be 320 */
@@ -364,9 +361,8 @@ void lava_filter(SDL_Surface *dst, SDL_Surface *src)
 	}
 }
 
-void water_filter(SDL_Surface *dst, SDL_Surface *src)
+void water_filter(Surface *dst, Surface *src)
 {
-	assert(src->format->BitsPerPixel == 8 && dst->format->BitsPerPixel == 8);
 	
 	Uint8 hue = smoothie_data[1] << 4;
 	
@@ -412,9 +408,8 @@ void water_filter(SDL_Surface *dst, SDL_Surface *src)
 	}
 }
 
-void iced_blur_filter(SDL_Surface *dst, SDL_Surface *src)
+void iced_blur_filter(Surface *dst, Surface *src)
 {
-	assert(src->format->BitsPerPixel == 8 && dst->format->BitsPerPixel == 8);
 	
 	Uint8 *dst_pixel = dst->pixels;
 	const Uint8 *src_pixel = src->pixels;
@@ -438,9 +433,8 @@ void iced_blur_filter(SDL_Surface *dst, SDL_Surface *src)
 	}
 }
 
-void blur_filter(SDL_Surface *dst, SDL_Surface *src)
+void blur_filter(Surface *dst, Surface *src)
 {
-	assert(src->format->BitsPerPixel == 8 && dst->format->BitsPerPixel == 8);
 	
 	Uint8 *dst_pixel = dst->pixels;
 	const Uint8 *src_pixel = src->pixels;
@@ -487,7 +481,7 @@ void initialize_starfield(void)
 	}
 }
 
-void update_and_draw_starfield(SDL_Surface* surface, int move_speed)
+void update_and_draw_starfield(Surface* surface, int move_speed)
 {
 	Uint8* p = (Uint8*)surface->pixels;
 

@@ -45,6 +45,7 @@
 #include "video.h"
 
 #include <assert.h>
+#include <math.h>
 
 enum
 {
@@ -400,7 +401,7 @@ void JE_itemScreen(void)
 				if (x < 10) /* 10 = reset to defaults, 11 = done */
 				{
 					temp2 = (x == curSel[curMenu]) ? 252 : 250;
-					JE_textShade(VGAScreen, 236, 38 + (x - 2)*12, SDL_GetScancodeName(keySettings[x-2]), temp2 / 16, temp2 % 16 - 8, DARKEN);
+					JE_textShade(VGAScreen, 236, 38 + (x - 2)*12, scancode_name(keySettings[x-2]), temp2 / 16, temp2 % 16 - 8, DARKEN);
 				}
 			}
 
@@ -976,11 +977,11 @@ void JE_itemScreen(void)
 							yChg = 1;
 					}
 
-					if (keysactive[SDL_SCANCODE_PAGEUP])
+					if (keysactive[SCANCODE_PAGEUP])
 					{
 						yChg = -2;
 					}
-					if (keysactive[SDL_SCANCODE_PAGEDOWN])
+					if (keysactive[SCANCODE_PAGEDOWN])
 					{
 						yChg = 2;
 					}
@@ -992,12 +993,12 @@ void JE_itemScreen(void)
 						joystick_down |= joystick[j].direction[2];
 					}
 
-					if (keysactive[SDL_SCANCODE_UP] || joystick_up)
+					if (keysactive[SCANCODE_UP] || joystick_up)
 					{
 						yChg = -1;
 					}
 
-					if (keysactive[SDL_SCANCODE_DOWN] || joystick_down)
+					if (keysactive[SCANCODE_DOWN] || joystick_down)
 					{
 						yChg = 1;
 					}
@@ -1192,7 +1193,7 @@ void JE_itemScreen(void)
 		{
 			switch (keyboardInput.scancode)
 			{
-			case SDL_SCANCODE_SLASH:
+			case SCANCODE_SLASH:
 				// if in rear weapon upgrade screen
 				if (curMenu == MENU_UPGRADE_SUB && curSel[MENU_UPGRADES] == 4)
 				{
@@ -1202,8 +1203,8 @@ void JE_itemScreen(void)
 				}
 				break;
 
-			case SDL_SCANCODE_SPACE:
-			case SDL_SCANCODE_RETURN:
+			case SCANCODE_SPACE:
+			case SCANCODE_RETURN:
 				// if front or rear weapon, update "Done" power level
 				if (curMenu == MENU_UPGRADE_SUB && (curSel[MENU_UPGRADES] == 3 || curSel[MENU_UPGRADES] == 4))
 					temp_weapon_power[itemAvailMax[itemAvailMap[curSel[MENU_UPGRADES]-2]-1]] = player[0].items.weapon[curSel[MENU_UPGRADES]-3].power;
@@ -1211,7 +1212,7 @@ void JE_itemScreen(void)
 				JE_menuFunction(curSel[curMenu]);
 				break;
 
-			case SDL_SCANCODE_ESCAPE:
+			case SCANCODE_ESCAPE:
 				JE_playSampleNum(S_SPRING);
 				if (curMenu == MENU_LOAD_SAVE && quikSave)
 				{
@@ -1242,7 +1243,7 @@ void JE_itemScreen(void)
 				}
 				break;
 
-			case SDL_SCANCODE_F1:
+			case SCANCODE_F1:
 				if (!isNetworkGame)
 				{
 					fade_black(10);
@@ -1273,7 +1274,7 @@ void JE_itemScreen(void)
 				}
 				break;
 
-			case SDL_SCANCODE_UP:
+			case SCANCODE_UP:
 				lastDirection = -1;
 
 				if (curMenu != MENU_DATA_CUBE_SUB)
@@ -1303,7 +1304,7 @@ void JE_itemScreen(void)
 
 				break;
 
-			case SDL_SCANCODE_DOWN:
+			case SCANCODE_DOWN:
 				lastDirection = 1;
 
 				if (curMenu != MENU_DATA_CUBE_SUB)
@@ -1333,17 +1334,17 @@ void JE_itemScreen(void)
 
 				break;
 
-			case SDL_SCANCODE_HOME:
+			case SCANCODE_HOME:
 				if (curMenu == MENU_DATA_CUBE_SUB)
 					yLoc = 0;
 				break;
 
-			case SDL_SCANCODE_END:
+			case SCANCODE_END:
 				if (curMenu == MENU_DATA_CUBE_SUB)
 					yLoc = (cube[currentCube].last_line - 9) * 12;
 				break;
 
-			case SDL_SCANCODE_LEFT:
+			case SCANCODE_LEFT:
 				if (curMenu == MENU_JOYSTICK_CONFIG)
 				{
 					if (joysticks > 0)
@@ -1441,7 +1442,7 @@ void JE_itemScreen(void)
 				}
 				break;
 
-			case SDL_SCANCODE_RIGHT:
+			case SCANCODE_RIGHT:
 				if (curMenu == MENU_JOYSTICK_CONFIG)
 				{
 					if (joysticks > 0)
@@ -1537,9 +1538,9 @@ void JE_itemScreen(void)
 			default:
 				switch (keyboardInput.sym)
 				{
-				case SDLK_s:
+				case 's':
 				{
-					if (keyboardInput.mod & KMOD_ALT &&
+					if (keyboardInput.mod & MOD_ALT &&
 					    curMenu != MENU_LOAD_SAVE)
 					{
 						if (curMenu == MENU_DATA_CUBE_SUB ||
@@ -1556,9 +1557,9 @@ void JE_itemScreen(void)
 					}
 					break;
 				}
-				case SDLK_l:
+				case 'l':
 				{
-					if (keyboardInput.mod & KMOD_ALT &&
+					if (keyboardInput.mod & MOD_ALT &&
 					    curMenu != MENU_LOAD_SAVE)
 					{
 						if (curMenu == MENU_DATA_CUBE_SUB ||
@@ -1743,7 +1744,7 @@ bool load_cube(int cube_slot, int cube_index)
 	if (file.error)
 	{
 		logFatal("Failed to open file '%s': %s", filename, fileGetError(&file));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	char buf[256] = { 0 };
@@ -1843,7 +1844,7 @@ bool load_cube(int cube_slot, int cube_index)
 	if (file.error)
 	{
 		logFatal("Failed to read from file '%s': %s", filename, fileGetError(&file));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	fileClose(&file);
@@ -2043,7 +2044,7 @@ void JE_updateNavScreen(void)
 	}
 }
 
-void JE_drawLines(SDL_Surface *surface, JE_boolean dark)
+void JE_drawLines(Surface *surface, JE_boolean dark)
 {
 	JE_byte x, y;
 	JE_integer tempX, tempY;
@@ -2183,7 +2184,7 @@ void JE_drawPlanet(JE_byte planetNum)
 	}
 }
 
-void JE_scaleBitmap(SDL_Surface *dst_bitmap, SDL_Surface *src_bitmap,  int x1, int y1, int x2, int y2)
+void JE_scaleBitmap(Surface *dst_bitmap, Surface *src_bitmap,  int x1, int y1, int x2, int y2)
 {
 	/* This function scales one screen and writes the result to another.
 	 *  The only code that calls it is the code run when you select 'ship
@@ -2425,17 +2426,17 @@ JE_boolean JE_quitRequest(void)
 		{
 			switch (keyboardInput.scancode)
 			{
-				case SDL_SCANCODE_LEFT:
-				case SDL_SCANCODE_RIGHT:
-				case SDL_SCANCODE_TAB:
+				case SCANCODE_LEFT:
+				case SCANCODE_RIGHT:
+				case SCANCODE_TAB:
 					quit_selected = !quit_selected;
 					JE_playSampleNum(S_CURSOR);
 					break;
-				case SDL_SCANCODE_RETURN:
-				case SDL_SCANCODE_SPACE:
+				case SCANCODE_RETURN:
+				case SCANCODE_SPACE:
 					done = true;
 					break;
-				case SDL_SCANCODE_ESCAPE:
+				case SCANCODE_ESCAPE:
 					quit_selected = false;
 					done = true;
 					break;
@@ -2504,7 +2505,7 @@ void JE_genItemMenu(JE_byte itemNum)
 	curSel[MENU_UPGRADE_SUB] = temp3;
 }
 
-void JE_scaleInPicture(SDL_Surface *dst, SDL_Surface *src)
+void JE_scaleInPicture(Surface *dst, Surface *src)
 {
 	assert(!isNetworkGame);
 
@@ -2513,16 +2514,16 @@ void JE_scaleInPicture(SDL_Surface *dst, SDL_Surface *src)
 		JE_scaleBitmap(dst, src, 160 - i, 0, 160 + i - 1, 100 + roundf(i * 0.625f) - 1);
 		JE_showVGA();
 
-		SDL_Delay(1);
+		plat_delay(1);
 
 		push_joysticks_as_keyboard();
-		handleSdlEvents();
+		handleInputEvents();
 
 		if (getInput())
 			break;
 	}
 
-	SDL_BlitSurface(src, NULL, dst, NULL);
+	surface_copy(dst, src);
 	JE_showVGA();
 }
 
@@ -2679,7 +2680,7 @@ void JE_menuFunction(JE_byte select)
 		{
 			temp2 = 254;
 			int tempY = 38 + (curSelect - 2) * 12;
-			JE_textShade(VGAScreen, 236, tempY, SDL_GetScancodeName(keySettings[curSelect-2]), (temp2 / 16), (temp2 % 16) - 8, DARKEN);
+			JE_textShade(VGAScreen, 236, tempY, scancode_name(keySettings[curSelect-2]), (temp2 / 16), (temp2 % 16) - 8, DARKEN);
 			JE_showVGA();
 
 			col = 248;
@@ -2706,7 +2707,7 @@ void JE_menuFunction(JE_byte select)
 				delayUntilElapsed();
 
 				poll_joysticks();  // Notably, not push_joystick_as_keyboard.
-				handleSdlEvents();
+				handleInputEvents();
 
 				if (hasInput(INPUT_NO_MOTION) || (joydown && !joyHeld))
 					break;
@@ -2730,9 +2731,9 @@ void JE_menuFunction(JE_byte select)
 					}
 				}
 				
-				if (keyboardInput.scancode != SDL_SCANCODE_ESCAPE && // reserved for menu
-				    keyboardInput.scancode != SDL_SCANCODE_F11 &&    // reserved for gamma
-				    keyboardInput.scancode != SDL_SCANCODE_P)        // reserved for pause
+				if (keyboardInput.scancode != SCANCODE_ESCAPE && // reserved for menu
+				    keyboardInput.scancode != SCANCODE_F11 &&    // reserved for gamma
+				    keyboardInput.scancode != SCANCODE_P)        // reserved for pause
 				{
 					JE_playSampleNum(S_CLICK);
 					keySettings[curSelect-2] = keyboardInput.scancode;
@@ -2984,7 +2985,7 @@ joystick_assign_done:
 	old_items[0] = player[0].items;
 }
 
-void JE_drawShipSpecs(SDL_Surface * screen, SDL_Surface * temp_screen)
+void JE_drawShipSpecs(Surface * screen, Surface * temp_screen)
 {
 	/* In this function we create our ship description image.
 	 *

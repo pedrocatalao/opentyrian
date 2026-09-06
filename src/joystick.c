@@ -16,6 +16,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#include "SDL.h"
+
 #include "joystick.h"
 
 #include "config.h"
@@ -164,7 +166,7 @@ void poll_joystick(int j)
 	joystick[j].input_pressed = false;
 	
 	// indicates that an direction/action has been held long enough to fake a repeat press
-	bool repeat = joystick[j].joystick_delay < SDL_GetTicks();
+	bool repeat = joystick[j].joystick_delay < plat_ticks();
 	
 	// update direction state
 	for (uint d = 0; d < COUNTOF(joystick[j].direction); d++)
@@ -199,7 +201,7 @@ void poll_joystick(int j)
 	
 	// if new input, reset press-repeat delay
 	if (joystick[j].input_pressed)
-		joystick[j].joystick_delay = SDL_GetTicks() + joystick_repeat_delay;
+		joystick[j].joystick_delay = plat_ticks() + joystick_repeat_delay;
 }
 
 // updates all joystick states
@@ -212,13 +214,13 @@ void poll_joysticks(void)
 }
 
 // sends SDL KEYDOWN and KEYUP events for a key
-void push_key(SDL_Scancode key)
+void push_key(Scancode key)
 {
 	SDL_Event e;
 	
 	memset(&e.key.keysym, 0, sizeof(e.key.keysym));
 	
-	e.key.keysym.scancode = key;
+	e.key.keysym.scancode = (SDL_Scancode)key;
 	e.key.state = SDL_RELEASED;
 	
 	e.type = SDL_KEYDOWN;
@@ -231,8 +233,8 @@ void push_key(SDL_Scancode key)
 // helps us be lazy by pretending joysticks are a keyboard (useful for menus)
 void push_joysticks_as_keyboard(void)
 {
-	const SDL_Scancode confirm = SDL_SCANCODE_RETURN, cancel = SDL_SCANCODE_ESCAPE;
-	const SDL_Scancode direction[4] = { SDL_SCANCODE_UP, SDL_SCANCODE_RIGHT, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT };
+	const Scancode confirm = SCANCODE_RETURN, cancel = SCANCODE_ESCAPE;
+	const Scancode direction[4] = { SCANCODE_UP, SCANCODE_RIGHT, SCANCODE_DOWN, SCANCODE_LEFT };
 	
 	poll_joysticks();
 	
@@ -409,7 +411,7 @@ bool save_joystick_assignments(Config *config, int j)
 {
 	ConfigSection *section = config_find_or_add_section(config, "joystick", SDL_JoystickName(joystick[j].handle));
 	if (section == NULL)
-		exit(EXIT_FAILURE);  // out of memory
+		plat_exit(EXIT_FAILURE);  // out of memory
 	
 	config_set_bool_option(section, "analog", joystick[j].analog, NO_YES);
 	
@@ -421,11 +423,11 @@ bool save_joystick_assignments(Config *config, int j)
 	{
 		ConfigOption *option = config_set_option(section, assignment_names[a], NULL);
 		if (option == NULL)
-			exit(EXIT_FAILURE);  // out of memory
+			plat_exit(EXIT_FAILURE);  // out of memory
 		
 		option = config_set_value(option, NULL);
 		if (option == NULL)
-			exit(EXIT_FAILURE);  // out of memory
+			plat_exit(EXIT_FAILURE);  // out of memory
 
 		for (size_t i = 0; i < COUNTOF(joystick[j].assignment[a]); ++i)
 		{
@@ -434,7 +436,7 @@ bool save_joystick_assignments(Config *config, int j)
 			
 			option = config_add_value(option, assignment_to_code(&joystick[j].assignment[a][i]));
 			if (option == NULL)
-				exit(EXIT_FAILURE);  // out of memory
+				plat_exit(EXIT_FAILURE);  // out of memory
 		}
 	}
 	
@@ -554,7 +556,7 @@ bool detect_joystick_assignment(int j, Joystick_assignment *assignment)
 
 		delayUntilElapsed();
 
-		handleSdlEvents();
+		handleInputEvents();
 
 		for (int i = 0; i < axes; ++i)
 		{

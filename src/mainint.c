@@ -54,6 +54,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <math.h>
 
 bool button[4];
 
@@ -290,7 +291,7 @@ void JE_helpSystem(JE_byte startTopic)
 							selectedIndex = i;
 						}
 
-						if (mouseInput.button == SDL_BUTTON_LEFT &&
+						if (mouseInput.button == MOUSE_BUTTON_LEFT &&
 						    mouseInput.x >= xMenuItem && mouseInput.x < xMenuItem + wMenuItem[i] &&
 						    mouseInput.y >= yMenuItem && mouseInput.y < yMenuItem + hMenuItem)
 						{
@@ -302,7 +303,7 @@ void JE_helpSystem(JE_byte startTopic)
 				}
 			}
 
-			if (mouseInput.button == SDL_BUTTON_RIGHT)
+			if (mouseInput.button == MOUSE_BUTTON_RIGHT)
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -313,7 +314,7 @@ void JE_helpSystem(JE_byte startTopic)
 		{
 			switch (keyboardInput.scancode)
 			{
-			case SDL_SCANCODE_UP:
+			case SCANCODE_UP:
 			{
 				JE_playSampleNum(S_CURSOR);
 
@@ -322,7 +323,7 @@ void JE_helpSystem(JE_byte startTopic)
 					: selectedIndex - 1;
 				break;
 			}
-			case SDL_SCANCODE_DOWN:
+			case SCANCODE_DOWN:
 			{
 				JE_playSampleNum(S_CURSOR);
 
@@ -331,13 +332,13 @@ void JE_helpSystem(JE_byte startTopic)
 					: selectedIndex + 1;
 				break;
 			}
-			case SDL_SCANCODE_SPACE:
-			case SDL_SCANCODE_RETURN:
+			case SCANCODE_SPACE:
+			case SCANCODE_RETURN:
 			{
 				action = true;
 				break;
 			}
-			case SDL_SCANCODE_ESCAPE:
+			case SCANCODE_ESCAPE:
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -505,7 +506,7 @@ static bool helpSystemPage(Uint8 *topic, bool *restart)
 		{
 			switch (mouseInput.button)
 			{
-			case SDL_BUTTON_LEFT:
+			case MOUSE_BUTTON_LEFT:
 			{
 				JE_playSampleNum(S_CURSOR);
 
@@ -515,7 +516,7 @@ static bool helpSystemPage(Uint8 *topic, bool *restart)
 					page += 1;
 				break;
 			}
-			case SDL_BUTTON_RIGHT:
+			case MOUSE_BUTTON_RIGHT:
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -530,23 +531,23 @@ static bool helpSystemPage(Uint8 *topic, bool *restart)
 		{
 			switch (keyboardInput.scancode)
 			{
-			case SDL_SCANCODE_LEFT:
+			case SCANCODE_LEFT:
 			{
 				JE_playSampleNum(S_CURSOR);
 
 				page -= 1;
 				break;
 			}
-			case SDL_SCANCODE_RIGHT:
-			case SDL_SCANCODE_SPACE:
-			case SDL_SCANCODE_RETURN:
+			case SCANCODE_RIGHT:
+			case SCANCODE_SPACE:
+			case SCANCODE_RETURN:
 			{
 				JE_playSampleNum(S_CURSOR);
 
 				page += 1;
 				break;
 			}
-			case SDL_SCANCODE_ESCAPE:
+			case SCANCODE_ESCAPE:
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -742,7 +743,7 @@ bool JE_loadScreen(void)
 			    mouseInput.x >= xLeftControl &&
 			    mouseInput.x < xLeftControl + wControl)
 			{
-				if (mouseInput.button == SDL_BUTTON_LEFT)
+				if (mouseInput.button == MOUSE_BUTTON_LEFT)
 				{
 					JE_playSampleNum(S_CURSOR);
 
@@ -754,7 +755,7 @@ bool JE_loadScreen(void)
 			         mouseInput.x >= xRightControl &&
 			         mouseInput.x < xRightControl + wControl)
 			{
-				if (mouseInput.button == SDL_BUTTON_LEFT)
+				if (mouseInput.button == MOUSE_BUTTON_LEFT)
 				{
 					JE_playSampleNum(S_CURSOR);
 
@@ -778,7 +779,7 @@ bool JE_loadScreen(void)
 								selectedIndex = i;
 							}
 
-							if (mouseInput.button == SDL_BUTTON_LEFT &&
+							if (mouseInput.button == MOUSE_BUTTON_LEFT &&
 							    mouseInput.x >= xMenuItem && mouseInput.x < xMenuItem + wMenuItem &&
 							    mouseInput.y >= yMenuItem && mouseInput.y < yMenuItem + hMenuItem)
 							{
@@ -791,7 +792,7 @@ bool JE_loadScreen(void)
 				}
 			}
 
-			if (mouseInput.button == SDL_BUTTON_RIGHT)
+			if (mouseInput.button == MOUSE_BUTTON_RIGHT)
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -802,21 +803,21 @@ bool JE_loadScreen(void)
 		{
 			switch (keyboardInput.scancode)
 			{
-			case SDL_SCANCODE_LEFT:
+			case SCANCODE_LEFT:
 			{
 				JE_playSampleNum(S_CURSOR);
 
 				leftAction = true;
 				break;
 			}
-			case SDL_SCANCODE_RIGHT:
+			case SCANCODE_RIGHT:
 			{
 				JE_playSampleNum(S_CURSOR);
 
 				rightAction = true;
 				break;
 			}
-			case SDL_SCANCODE_UP:
+			case SCANCODE_UP:
 			{
 				JE_playSampleNum(S_CURSOR);
 
@@ -825,7 +826,7 @@ bool JE_loadScreen(void)
 					: selectedIndex - 1;
 				break;
 			}
-			case SDL_SCANCODE_DOWN:
+			case SCANCODE_DOWN:
 			{
 				JE_playSampleNum(S_CURSOR);
 
@@ -834,13 +835,13 @@ bool JE_loadScreen(void)
 					: selectedIndex + 1;
 				break;
 			}
-			case SDL_SCANCODE_SPACE:
-			case SDL_SCANCODE_RETURN:
+			case SCANCODE_SPACE:
+			case SCANCODE_RETURN:
 			{
 				action = true;
 				break;
 			}
-			case SDL_SCANCODE_ESCAPE:
+			case SCANCODE_ESCAPE:
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -1197,7 +1198,7 @@ void JE_highScoreScreen(void)
 		{
 			switch (mouseInput.button)
 			{
-			case SDL_BUTTON_LEFT:
+			case MOUSE_BUTTON_LEFT:
 			{
 				if (leftControlVisible &&
 				    mouseInput.y >= yControls &&
@@ -1219,7 +1220,7 @@ void JE_highScoreScreen(void)
 				}
 				break;
 			}
-			case SDL_BUTTON_RIGHT:
+			case MOUSE_BUTTON_RIGHT:
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -1234,23 +1235,23 @@ void JE_highScoreScreen(void)
 		{
 			switch (keyboardInput.scancode)
 			{
-			case SDL_SCANCODE_LEFT:
+			case SCANCODE_LEFT:
 			{
 				JE_playSampleNum(S_CURSOR);
 
 				leftAction = true;
 				break;
 			}
-			case SDL_SCANCODE_RIGHT:
+			case SCANCODE_RIGHT:
 			{
 				JE_playSampleNum(S_CURSOR);
 
 				rightAction = true;
 				break;
 			}
-			case SDL_SCANCODE_SPACE:
-			case SDL_SCANCODE_RETURN:
-			case SDL_SCANCODE_ESCAPE:
+			case SCANCODE_SPACE:
+			case SCANCODE_RETURN:
+			case SCANCODE_ESCAPE:
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -1309,10 +1310,10 @@ void JE_gammaCorrect(Palette *colorBuffer, JE_byte gamma)
 
 JE_boolean JE_gammaCheck(void)
 {
-	bool temp = keysactive[SDL_SCANCODE_F11];
+	bool temp = keysactive[SCANCODE_F11];
 	if (temp)
 	{
-		keysactive[SDL_SCANCODE_F11] = false;
+		keysactive[SCANCODE_F11] = false;
 		gammaCorrection = (gammaCorrection + 1) % 4;
 		memcpy(colors, palettes[pcxpal[3-1]], sizeof(colors));
 		JE_gammaCorrect(&colors, gammaCorrection);
@@ -1359,7 +1360,7 @@ void JE_doInGameSetup(void)
 		}
 		quitRequested = false;
 
-		keysactive[SDL_SCANCODE_ESCAPE] = false;
+		keysactive[SCANCODE_ESCAPE] = false;
 
 #ifdef WITH_NETWORK
 		if (isNetworkGame)
@@ -1381,7 +1382,7 @@ void JE_doInGameSetup(void)
 #ifdef WITH_NETWORK
 	if (isNetworkGame)
 	{
-		SDL_Surface *temp_surface = VGAScreen;
+		Surface *temp_surface = VGAScreen;
 		VGAScreen = VGAScreenSeg; /* side-effect of game_screen */
 
 		if (!yourInGameMenuRequest)
@@ -1450,7 +1451,7 @@ JE_boolean JE_inGameSetup(void)
 {
 	bool result = false;
 
-	SDL_Surface *temp_surface = VGAScreen;
+	Surface *temp_surface = VGAScreen;
 	VGAScreen = VGAScreenSeg; /* side-effect of game_screen */
 
 	enum MenuItemIndex
@@ -1579,7 +1580,7 @@ JE_boolean JE_inGameSetup(void)
 							selectedIndex = i;
 						}
 
-						if (mouseInput.button == SDL_BUTTON_LEFT &&
+						if (mouseInput.button == MOUSE_BUTTON_LEFT &&
 						    mouseInput.x >= xMenuItem && mouseInput.x < xMenuItem + wMenuItem &&
 						    mouseInput.y >= yMenuItem && mouseInput.y < yMenuItem + hMenuItem)
 						{
@@ -1635,7 +1636,7 @@ JE_boolean JE_inGameSetup(void)
 				}
 			}
 
-			if (mouseInput.button == SDL_BUTTON_RIGHT)
+			if (mouseInput.button == MOUSE_BUTTON_RIGHT)
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -1646,7 +1647,7 @@ JE_boolean JE_inGameSetup(void)
 		{
 			switch (keyboardInput.scancode)
 			{
-			case SDL_SCANCODE_UP:
+			case SCANCODE_UP:
 			{
 				JE_playSampleNum(S_CURSOR);
 
@@ -1655,7 +1656,7 @@ JE_boolean JE_inGameSetup(void)
 					: selectedIndex - 1;
 				break;
 			}
-			case SDL_SCANCODE_DOWN:
+			case SCANCODE_DOWN:
 			{
 				JE_playSampleNum(S_CURSOR);
 
@@ -1664,30 +1665,30 @@ JE_boolean JE_inGameSetup(void)
 					: selectedIndex + 1;
 				break;
 			}
-			case SDL_SCANCODE_LEFT:
+			case SCANCODE_LEFT:
 			{
 				leftAction = true;
 				break;
 			}
-			case SDL_SCANCODE_RIGHT:
+			case SCANCODE_RIGHT:
 			{
 				rightAction = true;
 				break;
 			}
-			case SDL_SCANCODE_SPACE:
-			case SDL_SCANCODE_RETURN:
+			case SCANCODE_SPACE:
+			case SCANCODE_RETURN:
 			{
 				action = true;
 				break;
 			}
-			case SDL_SCANCODE_ESCAPE:
+			case SCANCODE_ESCAPE:
 			{
 				JE_playSampleNum(S_SPRING);
 
 				done = true;
 				break;
 			}
-			case SDL_SCANCODE_W:
+			case SCANCODE_W:
 			{
 				if (selectedIndex == MENU_ITEM_DETAIL_LEVEL)
 				{
@@ -1841,7 +1842,7 @@ void JE_inGameHelp(void)
 
 	setFrameCount(1);
 
-	SDL_Surface *temp_surface = VGAScreen;
+	Surface *temp_surface = VGAScreen;
 	VGAScreen = VGAScreenSeg; /* side-effect of game_screen */
 
 	//tempScreenSeg = VGAScreenSeg;
@@ -1984,7 +1985,7 @@ void JE_highScoreCheck(void)
 
 				JE_barShade(VGAScreen, 65, 55, 255, 155);
 
-				SDL_StartTextInput();
+				plat_text_input(true);
 
 				do
 				{
@@ -2071,19 +2072,19 @@ void JE_highScoreCheck(void)
 					{
 						switch (keyboardInput.scancode)
 						{
-							case SDL_SCANCODE_BACKSPACE:
-							case SDL_SCANCODE_DELETE:
+							case SCANCODE_BACKSPACE:
+							case SCANCODE_DELETE:
 								if (temp > 0)
 								{
 									temp -= 1;
 									stemp[temp] = ' ';
 								}
 								break;
-							case SDL_SCANCODE_ESCAPE:
+							case SCANCODE_ESCAPE:
 								quit = true;
 								cancel = true;
 								break;
-							case SDL_SCANCODE_RETURN:
+							case SCANCODE_RETURN:
 								quit = true;
 								break;
 							default:
@@ -2100,7 +2101,7 @@ void JE_highScoreCheck(void)
 					}
 				} while (!quit);
 
-				SDL_StopTextInput();
+				plat_text_input(false);
 
 				if (!cancel)
 				{
@@ -2365,7 +2366,7 @@ void JE_playCredits(void)
 	if (file.error)
 	{
 		logFatal("Failed to open file '%s': %s", filename, fileGetError(&file));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	// load credits text
@@ -2375,7 +2376,7 @@ void JE_playCredits(void)
 	if (file.error)
 	{
 		logFatal("Failed to read from file '%s': %s", filename, fileGetError(&file));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	fileClose(&file);
@@ -2559,7 +2560,7 @@ void JE_endLevelAni(void)
 	frameCountMax = 4;
 	textGlowFont = SMALL_FONT_SHAPES;
 
-	SDL_Color white = { 255, 255, 255 };
+	Color white = { 255, 255, 255 };
 	set_colors(white, 254, 254);
 
 	if (!levelTimer || levelTimerCountdown > 0 || !(episodeNum == 4))
@@ -2674,7 +2675,7 @@ void JE_endLevelAni(void)
 	JE_clr256(VGAScreen);
 }
 
-void JE_drawCube(SDL_Surface * screen, JE_word x, JE_word y, JE_byte filter, JE_byte brightness)
+void JE_drawCube(Surface * screen, JE_word x, JE_word y, JE_byte filter, JE_byte brightness)
 {
 	blit_sprite_dark(screen, x + 4, y + 4, OPTION_SHAPES, 25, false);
 	blit_sprite_dark(screen, x + 3, y + 3, OPTION_SHAPES, 25, false);
@@ -2735,7 +2736,7 @@ void JE_operation(JE_byte slot)
 
 		JE_barShade(VGAScreen, 65, 55, 255, 155);
 
-		SDL_StartTextInput();
+		plat_text_input(true);
 
 		bool quit = false;
 		while (!quit)
@@ -2807,8 +2808,8 @@ void JE_operation(JE_byte slot)
 			{
 				switch (keyboardInput.scancode)
 				{
-					case SDL_SCANCODE_BACKSPACE:
-					case SDL_SCANCODE_DELETE:
+					case SCANCODE_BACKSPACE:
+					case SCANCODE_DELETE:
 						if (temp > 0)
 						{
 							temp -= 1;
@@ -2816,11 +2817,11 @@ void JE_operation(JE_byte slot)
 							JE_playSampleNum(S_CLICK);
 						}
 						break;
-					case SDL_SCANCODE_ESCAPE:
+					case SCANCODE_ESCAPE:
 						quit = true;
 						JE_playSampleNum(S_SPRING);
 						break;
-					case SDL_SCANCODE_RETURN:
+					case SCANCODE_RETURN:
 						quit = true;
 						JE_saveGame(slot, stemp);
 						JE_playSampleNum(S_SELECT);
@@ -2840,7 +2841,7 @@ void JE_operation(JE_byte slot)
 			}
 		}
 
-		SDL_StopTextInput();
+		plat_text_input(false);
 	}
 }
 
@@ -2924,13 +2925,13 @@ void JE_mainKeyboardInput(void)
 	if (!isNetworkGame)
 	{
 		/* { Edited Ships } for Player 1 */
-		if (extraAvail && keysactive[SDL_SCANCODE_TAB] && !isNetworkGame && !superTyrian)
+		if (extraAvail && keysactive[SCANCODE_TAB] && !isNetworkGame && !superTyrian)
 		{
-			for (x = SDL_SCANCODE_1; x <= SDL_SCANCODE_0; x++)
+			for (x = SCANCODE_1; x <= SCANCODE_0; x++)
 			{
 				if (keysactive[x])
 				{
-					int z = x - SDL_SCANCODE_1 + 1;
+					int z = x - SCANCODE_1 + 1;
 					player[0].items.ship = 90 + z;                     /*Ships*/
 					z = (z - 1) * 15;
 					player[0].items.weapon[FRONT_WEAPON].id = extraShips[z + 1];
@@ -2953,7 +2954,7 @@ void JE_mainKeyboardInput(void)
 					else
 						editShip1 = true;
 
-					SDL_Surface *temp_surface = VGAScreen;
+					Surface *temp_surface = VGAScreen;
 					VGAScreen = VGAScreenSeg;
 					JE_wipeShieldArmorBars();
 					JE_drawArmor();
@@ -2967,13 +2968,13 @@ void JE_mainKeyboardInput(void)
 		}
 
 		/* for Player 2 */
-		if (extraAvail && keysactive[SDL_SCANCODE_CAPSLOCK] && !isNetworkGame && !superTyrian)
+		if (extraAvail && keysactive[SCANCODE_CAPSLOCK] && !isNetworkGame && !superTyrian)
 		{
-			for (x = SDL_SCANCODE_1; x <= SDL_SCANCODE_0; x++)
+			for (x = SCANCODE_1; x <= SCANCODE_0; x++)
 			{
 				if (keysactive[x])
 				{
-					int z = x - SDL_SCANCODE_1 + 1;
+					int z = x - SCANCODE_1 + 1;
 					player[1].items.ship = 90 + z;
 					z = (z - 1) * 15;
 					player[1].items.weapon[FRONT_WEAPON].id = extraShips[z + 1];
@@ -2996,7 +2997,7 @@ void JE_mainKeyboardInput(void)
 					else
 						editShip2 = true;
 
-					SDL_Surface *temp_surface = VGAScreen;
+					Surface *temp_surface = VGAScreen;
 					VGAScreen = VGAScreenSeg;
 					JE_wipeShieldArmorBars();
 					JE_drawArmor();
@@ -3011,7 +3012,7 @@ void JE_mainKeyboardInput(void)
 	}
 
 	/* { In-Game Help } */
-	if (keysactive[SDL_SCANCODE_F1])
+	if (keysactive[SCANCODE_F1])
 	{
 		if (isNetworkGame)
 		{
@@ -3025,8 +3026,8 @@ void JE_mainKeyboardInput(void)
 	}
 
 	/* {!Activate Nort Ship!} */
-	if (keysactive[SDL_SCANCODE_F2] && keysactive[SDL_SCANCODE_F4] && keysactive[SDL_SCANCODE_F6] && keysactive[SDL_SCANCODE_F7] &&
-	    keysactive[SDL_SCANCODE_F9] && keysactive[SDL_SCANCODE_BACKSLASH] && keysactive[SDL_SCANCODE_SLASH])
+	if (keysactive[SCANCODE_F2] && keysactive[SCANCODE_F4] && keysactive[SCANCODE_F6] && keysactive[SCANCODE_F7] &&
+	    keysactive[SCANCODE_F9] && keysactive[SCANCODE_BACKSLASH] && keysactive[SCANCODE_SLASH])
 	{
 		if (isNetworkGame)
 		{
@@ -3045,13 +3046,13 @@ void JE_mainKeyboardInput(void)
 	/* {Cheating} */
 	if (!isNetworkGame && !twoPlayerMode && !superTyrian && superArcadeMode == SA_NONE)
 	{
-		if (keysactive[SDL_SCANCODE_F2] && keysactive[SDL_SCANCODE_F3] && keysactive[SDL_SCANCODE_F6])
+		if (keysactive[SCANCODE_F2] && keysactive[SCANCODE_F3] && keysactive[SCANCODE_F6])
 		{
 			youAreCheating = !youAreCheating;
-			keysactive[SDL_SCANCODE_F2] = false;
+			keysactive[SCANCODE_F2] = false;
 		}
 
-		if (keysactive[SDL_SCANCODE_F2] && keysactive[SDL_SCANCODE_F3] && (keysactive[SDL_SCANCODE_F4] || keysactive[SDL_SCANCODE_F5]))
+		if (keysactive[SCANCODE_F2] && keysactive[SCANCODE_F3] && (keysactive[SCANCODE_F4] || keysactive[SCANCODE_F5]))
 		{
 			for (uint i = 0; i < COUNTOF(player); ++i)
 				player[i].armor = 0;
@@ -3060,10 +3061,10 @@ void JE_mainKeyboardInput(void)
 			JE_drawTextWindow(miscText[63-1]);
 		}
 
-		if (constantPlay && keysactive[SDL_SCANCODE_C])
+		if (constantPlay && keysactive[SCANCODE_C])
 		{
 			youAreCheating = !youAreCheating;
-			keysactive[SDL_SCANCODE_C] = false;
+			keysactive[SCANCODE_C] = false;
 		}
 	}
 
@@ -3075,20 +3076,20 @@ void JE_mainKeyboardInput(void)
 	/* {Personal Commands} */
 
 	/* {DEBUG} */
-	if (keysactive[SDL_SCANCODE_F10] && keysactive[SDL_SCANCODE_BACKSPACE])
+	if (keysactive[SCANCODE_F10] && keysactive[SCANCODE_BACKSPACE])
 	{
-		keysactive[SDL_SCANCODE_F10] = false;
+		keysactive[SCANCODE_F10] = false;
 		debug = !debug;
 
 		debugHist = 0;
 		debugHistCount = 0;
 
 		/* YKS: clock ticks since midnight replaced by SDL_GetTicks */
-		lastDebugTime = SDL_GetTicks();
+		lastDebugTime = plat_ticks();
 	}
 
 	/* {CHEAT-SKIP LEVEL} */
-	if (keysactive[SDL_SCANCODE_F2] && keysactive[SDL_SCANCODE_F6] && (keysactive[SDL_SCANCODE_F7] || keysactive[SDL_SCANCODE_F8]) && !keysactive[SDL_SCANCODE_F9] &&
+	if (keysactive[SCANCODE_F2] && keysactive[SCANCODE_F6] && (keysactive[SCANCODE_F7] || keysactive[SCANCODE_F8]) && !keysactive[SCANCODE_F9] &&
 	    !superTyrian && superArcadeMode == SA_NONE)
 	{
 		if (isNetworkGame)
@@ -3105,30 +3106,30 @@ void JE_mainKeyboardInput(void)
 	}
 
 	/* pause game */
-	pause_pressed |= keysactive[SDL_SCANCODE_P];
+	pause_pressed |= keysactive[SCANCODE_P];
 
 	/* in-game setup */
-	ingamemenu_pressed |= keysactive[SDL_SCANCODE_ESCAPE];
+	ingamemenu_pressed |= keysactive[SCANCODE_ESCAPE];
 
-	if (keysactive[SDL_SCANCODE_BACKSPACE])
+	if (keysactive[SCANCODE_BACKSPACE])
 	{
 		/* toggle screenshot pause */
-		if (keysactive[SDL_SCANCODE_NUMLOCKCLEAR])
+		if (keysactive[SCANCODE_NUMLOCKCLEAR])
 			superPause = !superPause;
 
 		/* {SMOOTHIES} */
-		if (keysactive[SDL_SCANCODE_F12] && keysactive[SDL_SCANCODE_SCROLLLOCK])
+		if (keysactive[SCANCODE_F12] && keysactive[SCANCODE_SCROLLLOCK])
 		{
-			for (temp = SDL_SCANCODE_2; temp <= SDL_SCANCODE_9; temp++)
+			for (temp = SCANCODE_2; temp <= SCANCODE_9; temp++)
 				if (keysactive[temp])
-					smoothies[temp-SDL_SCANCODE_2] = !smoothies[temp-SDL_SCANCODE_2];
-			if (keysactive[SDL_SCANCODE_0])
+					smoothies[temp-SCANCODE_2] = !smoothies[temp-SCANCODE_2];
+			if (keysactive[SCANCODE_0])
 				smoothies[8] = !smoothies[8];
 		}
 		else
 
 		/* {CYCLE THROUGH FILTER COLORS} */
-		if (keysactive[SDL_SCANCODE_MINUS])
+		if (keysactive[SCANCODE_MINUS])
 		{
 			if (levelFilter == -99)
 			{
@@ -3144,17 +3145,17 @@ void JE_mainKeyboardInput(void)
 		else
 
 		/* {HYPER-SPEED} */
-		if (keysactive[SDL_SCANCODE_1])
+		if (keysactive[SCANCODE_1])
 		{
 			fastPlay++;
 			if (fastPlay > 2)
 				fastPlay = 0;
-			keysactive[SDL_SCANCODE_1] = false;
+			keysactive[SCANCODE_1] = false;
 			JE_setNewGameSpeed();
 		}
 
 		/* {IN-GAME RANDOM MUSIC SELECTION} */
-		if (keysactive[SDL_SCANCODE_SCROLLLOCK])
+		if (keysactive[SCANCODE_SCROLLLOCK])
 			play_song(mt_rand() % MUSIC_NUM);
 	}
 }
@@ -3165,7 +3166,7 @@ void JE_pauseGame(void)
 
 	JE_boolean done = false;
 
-	SDL_Surface *temp_surface = VGAScreen;
+	Surface *temp_surface = VGAScreen;
 	VGAScreen = VGAScreenSeg; /* side-effect of game_screen */
 
 	//tempScreenSeg = VGAScreenSeg; // sega000
@@ -3211,10 +3212,10 @@ void JE_pauseGame(void)
 		KeyboardInput keyboardInput;
 
 		if ((keyboardGetInput(&keyboardInput) &&
-		     keyboardInput.scancode != SDL_SCANCODE_LCTRL &&
-		     keyboardInput.scancode != SDL_SCANCODE_RCTRL &&
-		     keyboardInput.scancode != SDL_SCANCODE_LALT &&
-		     keyboardInput.scancode != SDL_SCANCODE_RALT) ||
+		     keyboardInput.scancode != SCANCODE_LCTRL &&
+		     keyboardInput.scancode != SCANCODE_RCTRL &&
+		     keyboardInput.scancode != SCANCODE_LALT &&
+		     keyboardInput.scancode != SCANCODE_RALT) ||
 		    mouseGetInput(INPUT_NO_MOTION, NULL))
 		{
 #ifdef WITH_NETWORK
@@ -3225,7 +3226,7 @@ void JE_pauseGame(void)
 			}
 #endif
 
-			keysactive[SDL_SCANCODE_P] = false;
+			keysactive[SCANCODE_P] = false;
 
 			done = true;
 		}
@@ -3483,9 +3484,9 @@ redo:
 				/* mouse input */
 				if ((inputDevice == 0 || inputDevice == 2) && has_mouse)
 				{
-					button[0] |= (mouseButtonsDown & SDL_BUTTON_LMASK) != 0;
-					button[1] |= (mouseButtonsDown & SDL_BUTTON_RMASK) != 0;
-					button[2] |= (mouseButtonsDown & (mouse_has_three_buttons ? SDL_BUTTON_MMASK : SDL_BUTTON_RMASK)) != 0;
+					button[0] |= (mouseButtonsDown & MOUSE_BUTTON_LMASK) != 0;
+					button[1] |= (mouseButtonsDown & MOUSE_BUTTON_RMASK) != 0;
+					button[2] |= (mouseButtonsDown & (mouse_has_three_buttons ? MOUSE_BUTTON_MMASK : MOUSE_BUTTON_RMASK)) != 0;
 
 					Sint32 mouseXR;
 					Sint32 mouseYR;

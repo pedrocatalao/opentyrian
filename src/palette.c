@@ -28,13 +28,10 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static Uint32 rgb_to_yuv(int r, int g, int b);
-
 Palette palettes[23];
 size_t palettesCount = 0;
 
-static Palette palette;
-Uint32 rgb_palette[256], yuv_palette[256];
+Palette palette;
 
 Palette colors;
 
@@ -46,7 +43,7 @@ void loadPals(void)
 	if (file.error)
 	{
 		logFatal("Failed to open file '%s': %s", filename, fileGetError(&file));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	palettesCount = fileGetLength(&file) / (256 * 3);
@@ -76,7 +73,7 @@ void loadPals(void)
 	if (file.error)
 	{
 		logFatal("Failed to read from file '%s': %s", filename, fileGetError(&file));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	fileClose(&file);
@@ -87,18 +84,14 @@ void set_palette(Palette colors, unsigned int first_color, unsigned int last_col
 	for (uint i = first_color; i <= last_color; ++i)
 	{
 		palette[i] = colors[i];
-		rgb_palette[i] = SDL_MapRGB(main_window_tex_format, palette[i].r, palette[i].g, palette[i].b);
-		yuv_palette[i] = rgb_to_yuv(palette[i].r, palette[i].g, palette[i].b);
 	}
 }
 
-void set_colors(SDL_Color color, unsigned int first_color, unsigned int last_color)
+void set_colors(Color color, unsigned int first_color, unsigned int last_color)
 {
 	for (uint i = first_color; i <= last_color; ++i)
 	{
 		palette[i] = color;
-		rgb_palette[i] = SDL_MapRGB(main_window_tex_format, palette[i].r, palette[i].g, palette[i].b);
-		yuv_palette[i] = rgb_to_yuv(palette[i].r, palette[i].g, palette[i].b);
 	}
 }
 
@@ -112,7 +105,7 @@ void init_step_fade_palette(int diff[256][3], Palette colors, unsigned int first
 	}
 }
 
-void init_step_fade_solid(int diff[256][3], SDL_Color color, unsigned int first_color, unsigned int last_color)
+void init_step_fade_solid(int diff[256][3], Color color, unsigned int first_color, unsigned int last_color)
 {
 	for (unsigned int i = first_color; i <= last_color; i++)
 	{
@@ -138,8 +131,6 @@ void step_fade_palette(int diff[256][3], int steps, unsigned int first_color, un
 		palette[i].g += delta[1];
 		palette[i].b += delta[2];
 		
-		rgb_palette[i] = SDL_MapRGB(main_window_tex_format, palette[i].r, palette[i].g, palette[i].b);
-		yuv_palette[i] = rgb_to_yuv(palette[i].r, palette[i].g, palette[i].b);
 	}
 }
 
@@ -166,7 +157,7 @@ void fade_palette(Palette colors, int steps, unsigned int first_color, unsigned 
 	mouseClearInput();
 }
 
-void fade_solid(SDL_Color color, int steps, unsigned int first_color, unsigned int last_color)
+void fade_solid(Color color, int steps, unsigned int first_color, unsigned int last_color)
 {
 	assert(steps > 0);
 	
@@ -191,20 +182,12 @@ void fade_solid(SDL_Color color, int steps, unsigned int first_color, unsigned i
 
 void fade_black(int steps)
 {
-	SDL_Color black = { 0, 0, 0 };
+	Color black = { 0, 0, 0 };
 	fade_solid(black, steps, 0, 255);
 }
 
 void fade_white(int steps)
 {
-	SDL_Color white = { 255, 255, 255 };
+	Color white = { 255, 255, 255 };
 	fade_solid(white, steps, 0, 255);
-}
-
-static Uint32 rgb_to_yuv(int r, int g, int b)
-{
-	int y = (r + g + b) >> 2,
-	    u = 128 + ((r - b) >> 2),
-	    v = 128 + ((-r + 2 * g - b) >> 3);
-	return (y << 16) + (u << 8) + v;
 }

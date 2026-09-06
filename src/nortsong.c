@@ -24,7 +24,7 @@
 #include "opentyr.h"
 #include "sndmast.h"
 
-#include "SDL.h"
+#include "platform.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -57,14 +57,14 @@ void setFrameSpeed(Uint16 speed)  // FKA NortSong.speed and NortSong.setTimerInt
 	frameSpeed = speed;
 	framePeriod = ((Uint64)speed << 10) * 1000 * 88 * 3 / 315000000;
 
-	Uint32 now = SDL_GetTicks() << 10;
+	Uint32 now = plat_ticks() << 10;
 	frameCountEnd = now;
 }
 
 void setFrameCount(JE_word frameCount)  // FKA NortSong.frameCount
 {
 	// Keep the partial timer period that has already elapsed.
-	Uint32 now = SDL_GetTicks() << 10;
+	Uint32 now = plat_ticks() << 10;
 	Sint32 diff = now - frameCountEnd;
 	if (diff >= framePeriod)
 		frameCountEnd = now - (Uint32)diff % framePeriod;
@@ -77,7 +77,7 @@ void setFrameCount(JE_word frameCount)  // FKA NortSong.frameCount
 void setFrameCount2(JE_word frameCount2)  // FKA NortSong.frameCount2
 {
 	// Keep the partial timer period that has already elapsed.
-	Uint32 now = SDL_GetTicks() << 10;
+	Uint32 now = plat_ticks() << 10;
 	Sint32 diff = now - frameCount2End;
 	if (diff >= framePeriod)
 		frameCount2End = now - (Uint32)diff % framePeriod;
@@ -90,7 +90,7 @@ void setFrameCount2(JE_word frameCount2)  // FKA NortSong.frameCount2
 Uint32 getFrameCountTicks(void)
 {
 	const Uint32 half = 1 << 9;
-	Uint32 now = SDL_GetTicks() << 10;
+	Uint32 now = plat_ticks() << 10;
 	Sint32 diff = frameCountEnd - now;
 	return diff >= 0 ? ((Uint32)diff + half) >> 10 : 0;
 }
@@ -98,7 +98,7 @@ Uint32 getFrameCountTicks(void)
 Uint32 getFrameCount2Ticks(void)
 {
 	const Uint32 half = 1 << 9;
-	Uint32 now = SDL_GetTicks() << 10;
+	Uint32 now = plat_ticks() << 10;
 	Sint32 diff = frameCount2End - now;
 	return diff >= 0 ? ((Uint32)diff + half) >> 10 : 0;
 }
@@ -106,19 +106,43 @@ Uint32 getFrameCount2Ticks(void)
 void delayUntilElapsed(void)
 {
 	const Uint32 half = 1 << 9;
-	Uint32 now = SDL_GetTicks() << 10;
+	Uint32 now = plat_ticks() << 10;
 	Sint32 diff = frameCountEnd - now;
 	if (diff >= 0)
-		SDL_Delay(((Uint32)diff + half) >> 10);
+		plat_delay(((Uint32)diff + half) >> 10);
 }
 
-static void loadSounds(size_t soundsOffset, size_t soundsCount, const char *filename, bool trim, SDL_AudioCVT *cvt)
+// Converts signed 8-bit mono samples at 11025 Hz to signed 16-bit mono at
+// audioSampleRate, with linear interpolation.  Returns the output count.
+static size_t convertSamples(const Sint8 *in, size_t inCount, Sint16 *out, size_t outCapacity)
+{
+	if (inCount == 0 || audioSampleRate <= 0)
+		return 0;
+
+	const Uint32 inRate = 11025;
+	size_t outCount = (size_t)((Uint64)inCount * audioSampleRate / inRate);
+	if (outCount > outCapacity)
+		outCount = outCapacity;
+
+	for (size_t i = 0; i < outCount; ++i)
+	{
+		Uint64 pos = (Uint64)i * inRate;  // in input samples, scaled by audioSampleRate
+		size_t index = (size_t)(pos / audioSampleRate);
+		Uint32 frac = (Uint32)(pos % audioSampleRate);
+		Sint32 a = in[index] * 256;
+		Sint32 b = (index + 1 < inCount ? in[index + 1] : in[index]) * 256;
+		out[i] = (Sint16)(a + (b - a) * (Sint64)frac / audioSampleRate);
+	}
+	return outCount;
+}
+
+static void loadSounds(size_t soundsOffset, size_t soundsCount, const char *filename, bool trim)
 {
 	File file = dataFileOpen(filename, "rb");
 	if (file.error)
 	{
 		logFatal("Failed to open file '%s': %s", filename, fileGetError(&file));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	size_t maxSize = 0;
@@ -150,7 +174,9 @@ static void loadSounds(size_t soundsOffset, size_t soundsCount, const char *file
 		maxSize = MAX(maxSize, size);
 	}
 
-	cvt->buf = malloc(maxSize * cvt->len_mult);
+	Sint8 *inBuffer = malloc(maxSize);
+	size_t outCapacity = (size_t)((Uint64)maxSize * audioSampleRate / 11025) + 1;
+	Sint16 *outBuffer = malloc(outCapacity * sizeof *outBuffer);
 
 	for (size_t i = 0; i < count; ++i)
 	{
@@ -166,21 +192,17 @@ static void loadSounds(size_t soundsOffset, size_t soundsCount, const char *file
 
 		fileSetPosition(&file, position);
 
-		fileReadExactly(&file, cvt->buf, size);
-		cvt->len = size;
+		fileReadExactly(&file, inBuffer, size);
 
-		if (SDL_ConvertAudio(cvt) != 0)
-		{
-			logError("Failed to convert audio: %s", SDL_GetError());
-			continue;
-		}
+		size_t outCount = convertSamples(inBuffer, size, outBuffer, outCapacity);
 
-		soundSamples[soundsOffset + i] = malloc(cvt->len_cvt);
-		memcpy(soundSamples[soundsOffset + i], cvt->buf, cvt->len_cvt);
-		soundSampleCount[soundsOffset + i] = cvt->len_cvt / sizeof (Sint16);
+		soundSamples[soundsOffset + i] = malloc(outCount * sizeof (Sint16));
+		memcpy(soundSamples[soundsOffset + i], outBuffer, outCount * sizeof (Sint16));
+		soundSampleCount[soundsOffset + i] = outCount;
 	}
 
-	free(cvt->buf);
+	free(outBuffer);
+	free(inBuffer);
 
 	free(positions);
 
@@ -200,19 +222,11 @@ void loadSndFile(bool xmas)
 		soundSampleCount[i] = 0;
 	}
 
-	// Build converter to output sample format and rate.
-	SDL_AudioCVT cvt;
-	if (SDL_BuildAudioCVT(&cvt, AUDIO_S8, 1, 11025, AUDIO_S16SYS, 1, audioSampleRate) < 0)
-	{
-		logError("Failed to build audio converter: %s", SDL_GetError());
-		return;
-	}
-
 	const char *sfxFilename = "tyrian.snd";
-	loadSounds(0, SFX_COUNT, sfxFilename, false, &cvt);
+	loadSounds(0, SFX_COUNT, sfxFilename, false);
 
 	const char *voiceFilename = xmas ? "voicesc.snd" : "voices.snd";
-	loadSounds(SFX_COUNT, VOICE_COUNT, voiceFilename, true, &cvt);
+	loadSounds(SFX_COUNT, VOICE_COUNT, voiceFilename, true);
 }
 
 void JE_playSampleNum(JE_byte samplenum)

@@ -21,19 +21,19 @@
 
 #include "opentyr.h"
 
-#include "SDL.h"
+#include "platform.h"
 
 #define KEY_COMBO(mod, scancode) ((Uint32)(scancode) | \
-	(((mod) & KMOD_SHIFT ? (Uint32)KMOD_SHIFT : 0) | \
-	 ((mod) & KMOD_CTRL ? (Uint32)KMOD_CTRL : 0) | \
-	 ((mod) & KMOD_ALT ? (Uint32)KMOD_ALT : 0) | \
-	 ((mod) & KMOD_GUI ? (Uint32)KMOD_GUI : 0)) << 16)
+	(((mod) & MOD_SHIFT ? (Uint32)MOD_SHIFT : 0) | \
+	 ((mod) & MOD_CTRL ? (Uint32)MOD_CTRL : 0) | \
+	 ((mod) & MOD_ALT ? (Uint32)MOD_ALT : 0) | \
+	 ((mod) & MOD_GUI ? (Uint32)MOD_GUI : 0)) << 16)
 
 typedef struct KeyboardInput
 {
-	SDL_Keycode sym;  // Used for secret text input (ex. super arcade codes).
-	Uint16 scancode;  // SDL_Scancode; used for non-text input.
-	Uint16 mod;  // SDL_Keymod
+	Sint32 sym;  // ASCII of the unshifted key (US layout), like SDL keycodes; used for secret text input (ex. super arcade codes).
+	Uint16 scancode;  // Scancode; used for non-text input.
+	Uint16 mod;  // MOD_* flags
 	Uint8 ch;  // CP437 character; used for text input (ex. save file name).
 } KeyboardInput;
 
@@ -54,9 +54,9 @@ extern JE_boolean ESCPressed;  // TODO: Implement this.
 
 extern bool windowHasFocus;
 
-extern bool keysactive[SDL_NUM_SCANCODES];
+extern bool keysactive[SCANCODE_COUNT];
 
-extern const SDL_Keycode lordKeySyms[4];
+extern const Scancode lordKeyScancodes[4];
 extern bool lordKeySymsDown[4];
 
 extern Sint32 mouseX;
@@ -76,7 +76,9 @@ void mouseClearInput(void);
 void mouseSetRelative(bool enable);
 void mouseGetRelativePosition(Sint32 *out_x, Sint32 *out_y);
 
-void handleSdlEvents(void);
+
+// Pump the platform for pending input events.
+void handleInputEvents(void);
 
 bool hasInput(InputFlags flags);
 bool getInput(void);

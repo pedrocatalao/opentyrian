@@ -61,7 +61,7 @@ JE_word armorShipDelay;
 JE_byte warningCol;
 JE_shortint warningColChange;
 
-void JE_dString(SDL_Surface * screen, int x, int y, const char *s, unsigned int font)
+void JE_dString(Surface * screen, int x, int y, const char *s, unsigned int font)
 {
 	const int defaultBrightness = -3;
 
@@ -116,7 +116,7 @@ int JE_textWidth(const char *s, unsigned int font)
 	return x;
 }
 
-void JE_textShade(SDL_Surface * screen, int x, int y, const char *s, unsigned int colorbank, int brightness, unsigned int shadetype)
+void JE_textShade(Surface * screen, int x, int y, const char *s, unsigned int colorbank, int brightness, unsigned int shadetype)
 {
 	switch (shadetype)
 	{
@@ -140,7 +140,7 @@ void JE_textShade(SDL_Surface * screen, int x, int y, const char *s, unsigned in
 	}
 }
 
-void JE_outText(SDL_Surface * screen, int x, int y, const char *s, unsigned int colorbank, int brightness)
+void JE_outText(Surface * screen, int x, int y, const char *s, unsigned int colorbank, int brightness)
 {
 	int bright = 0;
 
@@ -173,7 +173,7 @@ void JE_outText(SDL_Surface * screen, int x, int y, const char *s, unsigned int 
 	}
 }
 
-void JE_outTextModify(SDL_Surface * screen, int x, int y, const char *s, unsigned int filter, unsigned int brightness, unsigned int font)
+void JE_outTextModify(Surface * screen, int x, int y, const char *s, unsigned int filter, unsigned int brightness, unsigned int font)
 {
 	for (int i = 0; s[i] != '\0'; ++i)
 	{
@@ -192,7 +192,7 @@ void JE_outTextModify(SDL_Surface * screen, int x, int y, const char *s, unsigne
 	}
 }
 
-void JE_outTextAdjust(SDL_Surface * screen, int x, int y, const char *s, unsigned int filter, int brightness, unsigned int font, JE_boolean shadow)
+void JE_outTextAdjust(Surface * screen, int x, int y, const char *s, unsigned int filter, int brightness, unsigned int font, JE_boolean shadow)
 {
 	int bright = 0;
 
@@ -224,7 +224,7 @@ void JE_outTextAdjust(SDL_Surface * screen, int x, int y, const char *s, unsigne
 	}
 }
 
-void JE_outTextAndDarken(SDL_Surface * screen, int x, int y, const char *s, unsigned int colorbank, unsigned int brightness, unsigned int font)
+void JE_outTextAndDarken(Surface * screen, int x, int y, const char *s, unsigned int colorbank, unsigned int brightness, unsigned int font)
 {
 	int bright = 0;
 
@@ -255,7 +255,7 @@ void JE_outTextAndDarken(SDL_Surface * screen, int x, int y, const char *s, unsi
 	}
 }
 
-void JE_updateWarning(SDL_Surface * screen)
+void JE_updateWarning(Surface * screen)
 {
 	if (getFrameCount2Ticks() == 0)
 	{
@@ -285,7 +285,7 @@ void JE_updateWarning(SDL_Surface * screen)
 	}
 }
 
-void JE_outTextGlow(SDL_Surface * screen, int x, int y, const char *s)
+void JE_outTextGlow(Surface * screen, int x, int y, const char *s)
 {
 	JE_integer z;
 	JE_byte c = 15;

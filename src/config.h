@@ -22,7 +22,7 @@
 #include "opentyr.h"
 #include "config_file.h"
 
-#include "SDL.h"
+#include "platform.h"
 
 #define SAVE_FILES_NUM (11 * 2)
 
@@ -55,7 +55,7 @@ enum
 	KEY_SETTING_RIGHT_SIDEKICK,
 };
 
-typedef SDL_Scancode KeySettings[8];
+typedef Scancode KeySettings[8];
 
 typedef JE_byte JE_PItemsType[12]; /* [1..12] */
 

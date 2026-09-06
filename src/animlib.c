@@ -29,6 +29,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 
 typedef struct FileHeader
 {
@@ -58,7 +59,7 @@ static void readFileHeader(FileHeader *fileHeader, File *file)
 	assert(reader.size == 0 && !reader.error);
 }
 
-static void readPalette(SDL_Color *palette, File *file)
+static void readPalette(Color *palette, File *file)
 {
 	Uint8 data[4 * 256];
 	fileReadExactly(file, data, sizeof data);
@@ -160,7 +161,7 @@ void playAnim(const char *filename, Uint8 startingFrame, Uint8 speed)
 	if (file.error)
 		goto fail;
 
-	SDL_Color palette[256];
+	Color palette[256];
 	readPalette(palette, &file);
 	if (file.error)
 		goto fail;

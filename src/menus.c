@@ -132,7 +132,7 @@ bool gameplaySelect(void)
 							selectedIndex = i;
 						}
 
-						if (mouseInput.button == SDL_BUTTON_LEFT &&
+						if (mouseInput.button == MOUSE_BUTTON_LEFT &&
 						    mouseInput.x >= xMenuItem && mouseInput.x < xMenuItem + wMenuItem[i] &&
 						    mouseInput.y >= yMenuItem && mouseInput.y < yMenuItem + hMenuItem)
 						{
@@ -144,7 +144,7 @@ bool gameplaySelect(void)
 				}
 			}
 
-			if (mouseInput.button == SDL_BUTTON_RIGHT)
+			if (mouseInput.button == MOUSE_BUTTON_RIGHT)
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -155,7 +155,7 @@ bool gameplaySelect(void)
 		{
 			switch (keyboardInput.scancode)
 			{
-			case SDL_SCANCODE_UP:
+			case SCANCODE_UP:
 			{
 				JE_playSampleNum(S_CURSOR);
 
@@ -164,7 +164,7 @@ bool gameplaySelect(void)
 					: selectedIndex - 1;
 				break;
 			}
-			case SDL_SCANCODE_DOWN:
+			case SCANCODE_DOWN:
 			{
 				JE_playSampleNum(S_CURSOR);
 
@@ -173,13 +173,13 @@ bool gameplaySelect(void)
 					: selectedIndex + 1;
 				break;
 			}
-			case SDL_SCANCODE_SPACE:
-			case SDL_SCANCODE_RETURN:
+			case SCANCODE_SPACE:
+			case SCANCODE_RETURN:
 			{
 				action = true;
 				break;
 			}
-			case SDL_SCANCODE_ESCAPE:
+			case SCANCODE_ESCAPE:
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -314,7 +314,7 @@ bool episodeSelect(void)
 							selectedIndex = i;
 						}
 
-						if (mouseInput.button == SDL_BUTTON_LEFT &&
+						if (mouseInput.button == MOUSE_BUTTON_LEFT &&
 						    mouseInput.x >= xMenuItem && mouseInput.x < xMenuItem + wMenuItem[i] &&
 						    mouseInput.y >= yMenuItem && mouseInput.y < yMenuItem + hMenuItem)
 						{
@@ -326,7 +326,7 @@ bool episodeSelect(void)
 				}
 			}
 
-			if (mouseInput.button == SDL_BUTTON_RIGHT)
+			if (mouseInput.button == MOUSE_BUTTON_RIGHT)
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -337,7 +337,7 @@ bool episodeSelect(void)
 		{
 			switch (keyboardInput.scancode)
 			{
-			case SDL_SCANCODE_UP:
+			case SCANCODE_UP:
 			{
 				JE_playSampleNum(S_CURSOR);
 
@@ -346,7 +346,7 @@ bool episodeSelect(void)
 					: selectedIndex - 1;
 				break;
 			}
-			case SDL_SCANCODE_DOWN:
+			case SCANCODE_DOWN:
 			{
 				JE_playSampleNum(S_CURSOR);
 
@@ -355,13 +355,13 @@ bool episodeSelect(void)
 					: selectedIndex + 1;
 				break;
 			}
-			case SDL_SCANCODE_SPACE:
-			case SDL_SCANCODE_RETURN:
+			case SCANCODE_SPACE:
+			case SCANCODE_RETURN:
 			{
 				action = true;
 				break;
 			}
-			case SDL_SCANCODE_ESCAPE:
+			case SCANCODE_ESCAPE:
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -490,7 +490,7 @@ bool difficultySelect(void)
 							selectedIndex = i;
 						}
 
-						if (mouseInput.button == SDL_BUTTON_LEFT &&
+						if (mouseInput.button == MOUSE_BUTTON_LEFT &&
 						    mouseInput.x >= xMenuItem && mouseInput.x < xMenuItem + wMenuItem[i] &&
 						    mouseInput.y >= yMenuItem && mouseInput.y < yMenuItem + hMenuItem)
 						{
@@ -502,7 +502,7 @@ bool difficultySelect(void)
 				}
 			}
 
-			if (mouseInput.button == SDL_BUTTON_RIGHT)
+			if (mouseInput.button == MOUSE_BUTTON_RIGHT)
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -513,7 +513,7 @@ bool difficultySelect(void)
 		{
 			switch (keyboardInput.scancode)
 			{
-			case SDL_SCANCODE_UP:
+			case SCANCODE_UP:
 			{
 				JE_playSampleNum(S_CURSOR);
 
@@ -522,7 +522,7 @@ bool difficultySelect(void)
 					: selectedIndex - 1;
 				break;
 			}
-			case SDL_SCANCODE_DOWN:
+			case SCANCODE_DOWN:
 			{
 				JE_playSampleNum(S_CURSOR);
 
@@ -531,13 +531,13 @@ bool difficultySelect(void)
 					: selectedIndex + 1;
 				break;
 			}
-			case SDL_SCANCODE_SPACE:
-			case SDL_SCANCODE_RETURN:
+			case SCANCODE_SPACE:
+			case SCANCODE_RETURN:
 			{
 				action = true;
 				break;
 			}
-			case SDL_SCANCODE_ESCAPE:
+			case SCANCODE_ESCAPE:
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -552,8 +552,8 @@ bool difficultySelect(void)
 			{
 			case 3:
 			{
-				if (keyboardInput.mod & KMOD_SHIFT &&
-				    keyboardInput.sym == SDLK_g)
+				if (keyboardInput.mod & MOD_SHIFT &&
+				    keyboardInput.sym == 'g')
 				{
 					menuItemsVisibleCount = 4;
 				}
@@ -561,8 +561,8 @@ bool difficultySelect(void)
 			}
 			case 4:
 			{
-				if (keyboardInput.mod & KMOD_SHIFT &&
-				    keyboardInput.sym == SDLK_RIGHTBRACKET)
+				if (keyboardInput.mod & MOD_SHIFT &&
+				    keyboardInput.sym == ']')
 				{
 					menuItemsVisibleCount = 5;
 				}
@@ -584,12 +584,12 @@ bool difficultySelect(void)
 
 				// Due to key rollover, holding down 4 keys simultaneous may not always be possible,
 				// so allow for typing them sequentially as well.
-				if (lordProgress < COUNTOF(lordKeySyms) &&
-				    keyboardInput.sym == lordKeySyms[lordProgress])
+				if (lordProgress < COUNTOF(lordKeyScancodes) &&
+				    keyboardInput.scancode == lordKeyScancodes[lordProgress])
 				{
 					lordProgress += 1;
 
-					if (lordProgress == COUNTOF(lordKeySyms))
+					if (lordProgress == COUNTOF(lordKeyScancodes))
 						menuItemsVisibleCount = 6;
 				}
 				else

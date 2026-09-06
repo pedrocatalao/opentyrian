@@ -35,6 +35,8 @@ jobs:
           install: >-
             make git curl unzip zip
             ${{ matrix.prefix }}-cc
+            ${{ matrix.prefix }}-cmake
+            ${{ matrix.prefix }}-ninja
             ${{ matrix.prefix }}-pkgconf
             ${{ matrix.prefix }}-SDL2
             ${{ matrix.prefix }}-SDL2_net
@@ -67,6 +69,29 @@ jobs:
         run: |
           mkdir -p /tmp/pkgtest && unzip -q "opentyrian-windows-${{ matrix.arch }}.zip" -d /tmp/pkgtest
           cd / && /tmp/pkgtest/opentyrian/opentyrian.exe --help
+      - name: Build the DXM core module
+        # A SEPARATE build tree: the game as DOS ex Machina loads it.  No SDL,
+        # no threads, no exit(): platform.h implemented on the host table.
+        # Compiles against the VENDORED src/dxm/dxm_core.h.
+        run: |
+          cmake -S . -B build-core -G Ninja -DOT_CORE=ON -DOT_MODULE=ON
+          cmake --build build-core
+      - name: Verify the module
+        run: |
+          test -f build-core/opentyrian.dxm
+          echo "built opentyrian.dxm"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: opentyrian-dxm-windows-${{ matrix.arch }}
+          path: build-core/opentyrian.dxm
+      - name: Attach module to release
+        if: github.event_name == 'release'
+        shell: bash          # runner's own bash — gh isn't on the MSYS2 PATH
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp build-core/opentyrian.dxm "opentyrian-windows-${{ matrix.arch }}.dxm"
+          gh release upload "${{ github.event.release.tag_name }}" "opentyrian-windows-${{ matrix.arch }}.dxm" --clobber
       - uses: actions/upload-artifact@v4
         with:
           name: opentyrian-windows-${{ matrix.arch }}

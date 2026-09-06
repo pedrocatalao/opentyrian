@@ -21,10 +21,11 @@
 
 #include "opentyr.h"
 
-#include "SDL.h"
 #ifdef WITH_NETWORK
-#	include "SDL_net.h"
+#include "SDL.h"
+#include "SDL_net.h"
 #endif
+
 
 #define PACKET_ACKNOWLEDGE   0x00    // 
 #define PACKET_KEEP_ALIVE    0x01    // 

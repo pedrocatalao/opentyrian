@@ -21,7 +21,7 @@
 
 #include "opentyr.h"
 
-#include "SDL.h"
+#include "platform.h"
 
 #define PART_SHADE 0
 #define FULL_SHADE 1
@@ -41,17 +41,17 @@ extern JE_word armorShipDelay;
 extern JE_byte warningCol;
 extern JE_shortint warningColChange;
 
-void JE_dString(SDL_Surface * screen, int x, int y, const char *s, unsigned int font);
+void JE_dString(Surface * screen, int x, int y, const char *s, unsigned int font);
 
 int JE_fontCenter(const char *s, unsigned int font);
 int JE_textWidth(const char *s, unsigned int font);
-void JE_textShade(SDL_Surface * screen, int x, int y, const char *s, unsigned int colorbank, int brightness, unsigned int shadetype);
-void JE_outText(SDL_Surface * screen, int x, int y, const char *s, unsigned int colorbank, int brightness);
-void JE_outTextModify(SDL_Surface * screen, int x, int y, const char *s, unsigned int filter, unsigned int brightness, unsigned int font);
-void JE_outTextAdjust(SDL_Surface * screen, int x, int y, const char *s, unsigned int filter, int brightness, unsigned int font, bool shadow);
-void JE_outTextAndDarken(SDL_Surface * screen, int x, int y, const char *s, unsigned int colorbank, unsigned int brightness, unsigned int font);
+void JE_textShade(Surface * screen, int x, int y, const char *s, unsigned int colorbank, int brightness, unsigned int shadetype);
+void JE_outText(Surface * screen, int x, int y, const char *s, unsigned int colorbank, int brightness);
+void JE_outTextModify(Surface * screen, int x, int y, const char *s, unsigned int filter, unsigned int brightness, unsigned int font);
+void JE_outTextAdjust(Surface * screen, int x, int y, const char *s, unsigned int filter, int brightness, unsigned int font, bool shadow);
+void JE_outTextAndDarken(Surface * screen, int x, int y, const char *s, unsigned int colorbank, unsigned int brightness, unsigned int font);
 
-void JE_updateWarning(SDL_Surface * screen);
-void JE_outTextGlow(SDL_Surface * screen, int x, int y, const char *s);
+void JE_updateWarning(Surface * screen);
+void JE_outTextGlow(Surface * screen, int x, int y, const char *s);
 
 #endif /* FONTHAND_H */

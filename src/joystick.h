@@ -21,7 +21,7 @@
 
 #include "config_file.h"
 
-#include "SDL.h"
+#include "platform.h"
 
 typedef enum
 {
@@ -47,7 +47,7 @@ Joystick_assignment;
 
 typedef struct
 {
-	SDL_Joystick *handle;
+	struct _SDL_Joystick *handle;
 	
 	Joystick_assignment assignment[10][2]; // 0-3: directions, 4-9: actions
 	
@@ -78,7 +78,7 @@ bool joystick_analog_angle(int j, float *angle);
 void poll_joystick(int j);
 void poll_joysticks(void);
 
-void push_key(SDL_Scancode key);
+void push_key(Scancode key);
 void push_joysticks_as_keyboard(void);
 
 void init_joysticks(void);

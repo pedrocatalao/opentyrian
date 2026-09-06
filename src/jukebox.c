@@ -83,7 +83,7 @@ void jukebox(void)  // FKA Setup.jukeboxGo
 
 		setFrameCount(1);
 
-		SDL_FillRect(VGAScreenSeg, NULL, 0);
+		surface_fill_rect(VGAScreenSeg, NULL, 0);
 
 		KeyboardInput keyboardInput;
 
@@ -120,67 +120,67 @@ void jukebox(void)  // FKA Setup.jukeboxGo
 		{
 			switch (KEY_COMBO(keyboardInput.mod, keyboardInput.scancode))
 			{
-			case SDL_SCANCODE_ESCAPE:
-			case SDL_SCANCODE_Q:
-			case KEY_COMBO(KMOD_SHIFT, SDL_SCANCODE_Q):
+			case SCANCODE_ESCAPE:
+			case SCANCODE_Q:
+			case KEY_COMBO(MOD_SHIFT, SCANCODE_Q):
 				trigger_quit = true;
 				break;
 
-			case SDL_SCANCODE_SPACE:
+			case SCANCODE_SPACE:
 				hide_text = !hide_text;
 				break;
 
-			case SDL_SCANCODE_F:
-			case KEY_COMBO(KMOD_SHIFT, SDL_SCANCODE_F):
+			case SCANCODE_F:
+			case KEY_COMBO(MOD_SHIFT, SCANCODE_F):
 				fading_song = !fading_song;
 				break;
-			case SDL_SCANCODE_N:
-			case KEY_COMBO(KMOD_SHIFT, SDL_SCANCODE_N):
+			case SCANCODE_N:
+			case KEY_COMBO(MOD_SHIFT, SCANCODE_N):
 				fade_looped_songs = !fade_looped_songs;
 				break;
-			case SDL_SCANCODE_V:
-			case KEY_COMBO(KMOD_SHIFT, SDL_SCANCODE_V):
+			case SCANCODE_V:
+			case KEY_COMBO(MOD_SHIFT, SCANCODE_V):
 				// Not implemented.
 				break;
-			case SDL_SCANCODE_T:
-			case KEY_COMBO(KMOD_SHIFT, SDL_SCANCODE_T):
+			case SCANCODE_T:
+			case KEY_COMBO(MOD_SHIFT, SCANCODE_T):
 				// Not implemented.
 				break;
 
-			case SDL_SCANCODE_SLASH:
+			case SCANCODE_SLASH:
 				fx = !fx;
 				break;
-			case SDL_SCANCODE_COMMA:
+			case SCANCODE_COMMA:
 				if (fx && --fx_num < 0)
 					fx_num = SOUND_COUNT - 1;
 				break;
-			case SDL_SCANCODE_PERIOD:
+			case SCANCODE_PERIOD:
 				if (fx && ++fx_num >= SOUND_COUNT)
 					fx_num = 0;
 				break;
-			case SDL_SCANCODE_SEMICOLON:
+			case SCANCODE_SEMICOLON:
 				if (fx)
 					JE_playSampleNum(fx_num + 1);
 				break;
 
-			case SDL_SCANCODE_LEFT:
-			case SDL_SCANCODE_UP:
+			case SCANCODE_LEFT:
+			case SCANCODE_UP:
 				play_song((song_playing > 0 ? song_playing : MUSIC_NUM) - 1);
 				stopped = false;
 				break;
-			case SDL_SCANCODE_RETURN:
-			case SDL_SCANCODE_RIGHT:
-			case SDL_SCANCODE_DOWN:
+			case SCANCODE_RETURN:
+			case SCANCODE_RIGHT:
+			case SCANCODE_DOWN:
 				play_song((song_playing + 1) % MUSIC_NUM);
 				stopped = false;
 				break;
-			case SDL_SCANCODE_S:
-			case KEY_COMBO(KMOD_SHIFT, SDL_SCANCODE_S):
+			case SCANCODE_S:
+			case KEY_COMBO(MOD_SHIFT, SCANCODE_S):
 				stop_song();
 				stopped = true;
 				break;
-			case SDL_SCANCODE_R:
-			case KEY_COMBO(KMOD_SHIFT, SDL_SCANCODE_R):
+			case SCANCODE_R:
+			case KEY_COMBO(MOD_SHIFT, SCANCODE_R):
 				restart_song();
 				stopped = false;
 				break;
@@ -195,7 +195,7 @@ void jukebox(void)  // FKA Setup.jukeboxGo
 		{
 			palette_fade_steps = 15;
 			
-			SDL_Color black = { 0, 0, 0 };
+			Color black = { 0, 0, 0 };
 			init_step_fade_solid(diff, black, 0, 255);
 			
 			quitting = true;

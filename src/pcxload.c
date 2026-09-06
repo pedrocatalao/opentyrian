@@ -35,7 +35,7 @@ void JE_loadPCX(const char *filename) // this is only meant to load tshp2.pcx
 	if (file.error)
 	{
 		logFatal("Failed to open file '%s': %s", filename, fileGetError(&file));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	long fileLength = fileGetLength(&file);
@@ -94,9 +94,9 @@ void JE_loadPCX(const char *filename) // this is only meant to load tshp2.pcx
 
 	free(data);
 
-	SDL_Surface *const screen = VGAScreen;
+	Surface *const screen = VGAScreen;
 
-	assert(screen->w == 320 && screen->h == 200 && screen->format->BytesPerPixel == 1);
+	assert(screen->w == 320 && screen->h == 200);
 	for (size_t y = 0; y < 200; ++y)
 		memcpy((Uint8 *)screen->pixels + y * screen->pitch, image + y * 320, 320);
 

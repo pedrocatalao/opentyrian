@@ -24,6 +24,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include "platform.h"
 
 JE_LvlPosType lvlPos;
 
@@ -36,7 +37,7 @@ void analyzeLevel(void)
 	if (file.error)
 	{
 		logFatal("Failed to open file '%s': %s", levelFilename, fileGetError(&file));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	lvlNum = fileReadU16(&file);
@@ -53,7 +54,7 @@ void analyzeLevel(void)
 	if (file.error)
 	{
 		logFatal("Failed to read from file '%s': %s", levelFilename, fileGetError(&file));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	fileClose(&file);

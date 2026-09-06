@@ -56,7 +56,7 @@
 #include <string.h>
 #include <stdint.h>
 
-inline static void blit_enemy(SDL_Surface *surface, unsigned int i, signed int x_offset, signed int y_offset, signed int sprite_offset);
+inline static void blit_enemy(Surface *surface, unsigned int i, signed int x_offset, signed int y_offset, signed int sprite_offset);
 
 boss_bar_t boss_bar[2];
 
@@ -153,13 +153,13 @@ void JE_starShowVGA(void)
 		JE_showVGA();
 	}
 
-	handleSdlEvents();
+	handleInputEvents();
 
 	quitRequested = false;
 	skipStarShowVGA = false;
 }
 
-inline static void blit_enemy(SDL_Surface *surface, unsigned int i, signed int x_offset, signed int y_offset, signed int sprite_offset)
+inline static void blit_enemy(Surface *surface, unsigned int i, signed int x_offset, signed int y_offset, signed int sprite_offset)
 {
 	if (enemy[i].sprite2s == NULL)
 		return;
@@ -2018,7 +2018,7 @@ draw_player_shot_loop_end:
 	}
 
 	/*-------      DEbug      ---------*/
-	debugTime = SDL_GetTicks();
+	debugTime = plat_ticks();
 
 	if (debug)
 	{
@@ -2115,7 +2115,7 @@ draw_player_shot_loop_end:
 				if (!playDemo)
 				{
 					push_joysticks_as_keyboard();
-					handleSdlEvents();
+					handleInputEvents();
 
 					if (hasInput(INPUT_NO_MOTION))
 						reallyEndLevel = true;
@@ -2130,7 +2130,7 @@ draw_player_shot_loop_end:
 	if (playDemo) // input stops demo
 	{
 		push_joysticks_as_keyboard();
-		handleSdlEvents();
+		handleInputEvents();
 
 		if (hasInput(INPUT_NO_MOTION))
 		{
@@ -2141,7 +2141,7 @@ draw_player_shot_loop_end:
 	}
 	else // input handling for pausing, menu, cheats
 	{
-		handleSdlEvents();
+		handleInputEvents();
 
 		// Ensure gameplay input does not affect pause or menu.
 		mouseClearInput();
@@ -2340,7 +2340,7 @@ static void readEpisodeString(File *file, char *dst, size_t size)
 	if (file->error)
 	{
 		logFatal("Failed to read from file '%s': %s", episodeFilename, fileGetError(file));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 }
 
@@ -2387,7 +2387,7 @@ new_game:
 			if (episodeFile.error)
 			{
 				logFatal("Failed to open file '%s': %s", episodeFilename, fileGetError(&episodeFile));
-				exit(EXIT_FAILURE);
+				plat_exit(EXIT_FAILURE);
 			}
 
 			jumpSection = false;
@@ -2580,7 +2580,7 @@ new_game:
 
 					case 'L':  // Play level.
 						nextLevel = atoi(s + 9);
-						SDL_strlcpy(levelName, s + 13, 10);
+						ot_strlcpy(levelName, s + 13, 10);
 						levelSong = atoi(s + 22);
 						if (nextLevel == 0)
 						{
@@ -2641,7 +2641,7 @@ new_game:
 								continue;
 							}
 
-							SDL_strlcpy(levelWarningText[levelWarningLines], s, sizeof *levelWarningText);
+							ot_strlcpy(levelWarningText[levelWarningLines], s, sizeof *levelWarningText);
 							levelWarningLines++;
 						}
 
@@ -2923,7 +2923,7 @@ new_game:
 										continue;
 									}
 
-									SDL_strlcpy(levelWarningText[levelWarningLines], s, sizeof *levelWarningText);
+									ot_strlcpy(levelWarningText[levelWarningLines], s, sizeof *levelWarningText);
 									levelWarningLines++;
 								}
 
@@ -2988,7 +2988,7 @@ new_game:
 	if (levelFile.error)
 	{
 		logFatal("Failed to open file '%s': %s", levelFilename, fileGetError(&levelFile));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	fileSetPosition(&levelFile, lvlPos[(lvlFileNum-1) * 2]);
@@ -3009,7 +3009,7 @@ new_game:
 	if (maxEvent >= COUNTOF(eventRec))
 	{
 		logFatal("Level has too many events.");
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 	for (x = 0; x < maxEvent; x++)
 	{
@@ -3040,7 +3040,7 @@ new_game:
 	if (shapesFile.error)
 	{
 		logFatal("Failed to open file '%s': %s", shapesFilename, fileGetError(&shapesFile));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	for (int z = 0; z < 600; z++)
@@ -3114,7 +3114,7 @@ new_game:
 	if (shapesFile.error)
 	{
 		logFatal("Failed to read from file '%s': %s", shapesFilename, fileGetError(&shapesFile));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	fileClose(&shapesFile);
@@ -3155,7 +3155,7 @@ new_game:
 	if (levelFile.error)
 	{
 		logFatal("Failed to read from file '%s': %s", levelFilename, fileGetError(&levelFile));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	fileClose(&levelFile);
@@ -3258,7 +3258,7 @@ bool titleScreen(void)
 		MENU_ITEM_QUIT,
 	};
 
-	SDL_strlcpy(menuText[4], "Setup", sizeof menuText[4]);  // override "Ordering Info"
+	ot_strlcpy(menuText[4], "Setup", sizeof menuText[4]);  // override "Ordering Info"
 
 	if (shopSpriteSheet.data == NULL)
 		JE_loadCompShapes(&shopSpriteSheet, '1');  // need mouse pointer sprites
@@ -3350,12 +3350,12 @@ bool titleScreen(void)
 		JE_showVGA();
 		JE_mouseReplace();
 
-		const Uint32 idleStartTick = SDL_GetTicks();
+		const Uint32 idleStartTick = plat_ticks();
 
 		while (true)
 		{
 			// Play demo after idle for 30 seconds.
-			if (SDL_GetTicks() - idleStartTick > 30000)
+			if (plat_ticks() - idleStartTick > 30000)
 			{
 				fade_black(15);
 
@@ -3397,7 +3397,7 @@ bool titleScreen(void)
 							selectedIndex = i;
 						}
 
-						if (mouseInput.button == SDL_BUTTON_LEFT &&
+						if (mouseInput.button == MOUSE_BUTTON_LEFT &&
 						    mouseInput.x >= xMenuItem && mouseInput.x < xMenuItem + wMenuItem[i] &&
 						    mouseInput.y >= yMenuItem && mouseInput.y < yMenuItem + hMenuItem)
 						{
@@ -3409,7 +3409,7 @@ bool titleScreen(void)
 				}
 			}
 
-			if (mouseInput.button == SDL_BUTTON_RIGHT)
+			if (mouseInput.button == MOUSE_BUTTON_RIGHT)
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -3420,7 +3420,7 @@ bool titleScreen(void)
 		{
 			switch (keyboardInput.scancode)
 			{
-			case SDL_SCANCODE_UP:
+			case SCANCODE_UP:
 			{
 				JE_playSampleNum(S_CURSOR);
 
@@ -3429,7 +3429,7 @@ bool titleScreen(void)
 					: selectedIndex - 1;
 				break;
 			}
-			case SDL_SCANCODE_DOWN:
+			case SCANCODE_DOWN:
 			{
 				JE_playSampleNum(S_CURSOR);
 
@@ -3438,13 +3438,13 @@ bool titleScreen(void)
 					: selectedIndex + 1;
 				break;
 			}
-			case SDL_SCANCODE_SPACE:
-			case SDL_SCANCODE_RETURN:
+			case SCANCODE_SPACE:
+			case SCANCODE_RETURN:
 			{
 				action = true;
 				break;
 			}
-			case SDL_SCANCODE_ESCAPE:
+			case SCANCODE_ESCAPE:
 			{
 				JE_playSampleNum(S_SPRING);
 
@@ -3454,7 +3454,7 @@ bool titleScreen(void)
 				break;
 			}
 
-			SDL_Keycode sym = toupper(keyboardInput.sym);
+			int sym = toupper(keyboardInput.sym);
 
 			for (size_t i = 0; i < SA_ENGAGE; i++)
 			{
@@ -3481,7 +3481,7 @@ bool titleScreen(void)
 						JE_playSampleNum(V_DATA_CUBE);
 
 						JE_whoa();
-						set_colors((SDL_Color) { 0, 0, 0 }, 0, 255);
+						set_colors((Color) { 0, 0, 0 }, 0, 255);
 
 						newSuperTyrianGame();
 						return true;
@@ -3670,7 +3670,7 @@ void newSuperTyrianGame(void)
 {
 	/* SuperTyrian */
 
-	initialDifficulty = keysactive[SDL_SCANCODE_SCROLLLOCK] ? DIFFICULTY_SUICIDE : DIFFICULTY_ZINGLON;
+	initialDifficulty = keysactive[SCANCODE_SCROLLLOCK] ? DIFFICULTY_SUICIDE : DIFFICULTY_ZINGLON;
 
 	JE_clr256(VGAScreen);
 	JE_outText(VGAScreen, 10, 10, "Cheat codes have been disabled.", 15, 4);
@@ -3699,7 +3699,7 @@ void newSuperTyrianGame(void)
 
 		KeyboardInput keyboardInput;
 		if ((keyboardGetInput(&keyboardInput) &&
-		     keyboardInput.scancode != SDL_SCANCODE_SCROLLLOCK) ||
+		     keyboardInput.scancode != SCANCODE_SCROLLLOCK) ||
 		    mouseGetInput(INPUT_NO_MOTION, NULL))
 		{
 			break;
@@ -3725,7 +3725,7 @@ void intro_logos(void)
 {
 	moveTyrianLogoUp = true;
 
-	SDL_FillRect(VGAScreen, NULL, 0);
+	surface_fill_rect(VGAScreen, NULL, 0);
 
 	fade_white(25);
 
@@ -5141,7 +5141,7 @@ void JE_whoa(void)
 
 		KeyboardInput keyboardInput;
 		if ((keyboardGetInput(&keyboardInput) &&
-		     keyboardInput.scancode != SDL_SCANCODE_SCROLLLOCK) ||
+		     keyboardInput.scancode != SCANCODE_SCROLLLOCK) ||
 		    mouseGetInput(INPUT_NO_MOTION, NULL))
 		{
 			break;

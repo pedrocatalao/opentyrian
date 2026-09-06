@@ -19,28 +19,28 @@
 #ifndef PALETTE_H
 #define PALETTE_H
 
-#include "SDL.h"
+#include "platform.h"
 
-typedef SDL_Color Palette[256];
+typedef Color Palette[256];
 
 extern Palette palettes[];
 extern size_t palettesCount;
 
-extern Uint32 rgb_palette[256], yuv_palette[256];
+extern Palette palette;  // what is currently shown
 
 extern Palette colors; // TODO: get rid of this
 
 void loadPals(void);
 
 void set_palette(Palette colors, unsigned int first_color, unsigned int last_color);
-void set_colors(SDL_Color color, unsigned int first_color, unsigned int last_color);
+void set_colors(Color color, unsigned int first_color, unsigned int last_color);
 
 void init_step_fade_palette(int diff[256][3], Palette colors, unsigned int first_color, unsigned int last_color);
-void init_step_fade_solid(int diff[256][3], SDL_Color color, unsigned int first_color, unsigned int last_color);
+void init_step_fade_solid(int diff[256][3], Color color, unsigned int first_color, unsigned int last_color);
 void step_fade_palette(int diff[256][3], int steps, unsigned int first_color, unsigned int last_color);
 
 void fade_palette(Palette colors, int steps, unsigned int first_color, unsigned int last_color);
-void fade_solid(SDL_Color color, int steps, unsigned int first_color, unsigned int last_color);
+void fade_solid(Color color, int steps, unsigned int first_color, unsigned int last_color);
 
 void fade_black(int steps);
 void fade_white(int steps);

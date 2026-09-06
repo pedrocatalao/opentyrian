@@ -82,7 +82,7 @@ void JE_paramCheck(int argc, char *argv[])
 		case AMBIGUOUS_OPTION:
 		case OPTION_MISSING_ARG:
 			logError("Try '%s --help' for more information.", argv[0]);
-			exit(EXIT_FAILURE);
+			plat_exit(EXIT_FAILURE);
 			break;
 			
 		case 'h':
@@ -100,7 +100,7 @@ void JE_paramCheck(int argc, char *argv[])
 			logInfo("                               (1 or 2)");
 			logInfo("  -p, --net-port=PORT          Set local port to bind (default is 1333)");
 			logInfo("  -d, --net-delay=FRAMES       Set lag-compensation delay (default is 1)");
-			exit(EXIT_SUCCESS);
+			plat_exit(EXIT_SUCCESS);
 			break;
 			
 		case 's':
@@ -136,11 +136,11 @@ void JE_paramCheck(int argc, char *argv[])
 				else
 				{
 					logError("%s: invalid network port number", argv[0]);
-					exit(EXIT_FAILURE);
+					plat_exit(EXIT_FAILURE);
 				}
 				
 				network_opponent_host = malloc(temp + 1);
-				SDL_strlcpy(network_opponent_host, option.arg, temp + 1);
+				ot_strlcpy(network_opponent_host, option.arg, temp + 1);
 			}
 			else
 			{
@@ -162,7 +162,7 @@ void JE_paramCheck(int argc, char *argv[])
 			else
 			{
 				logError("%s: invalid network player number", argv[0]);
-				exit(EXIT_FAILURE);
+				plat_exit(EXIT_FAILURE);
 			}
 			break;
 		}
@@ -174,7 +174,7 @@ void JE_paramCheck(int argc, char *argv[])
 			else
 			{
 				logError("%s: invalid network port number", argv[0]);
-				exit(EXIT_FAILURE);
+				plat_exit(EXIT_FAILURE);
 			}
 			break;
 		}
@@ -186,7 +186,7 @@ void JE_paramCheck(int argc, char *argv[])
 			else
 			{
 				logError("%s: invalid network delay value", argv[0]);
-				exit(EXIT_FAILURE);
+				plat_exit(EXIT_FAILURE);
 			}
 			break;
 		}

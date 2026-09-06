@@ -31,6 +31,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
+#include "platform.h"
 
 /* potential size of decimal representation of type */
 #define udecsizeof(t) ((CHAR_BIT * sizeof(t) / 3) + 1)
@@ -41,7 +42,7 @@ extern void config_oom(void);
 void config_oom(void)
 {
 	logFatal("Out of memory.");
-	exit(EXIT_FAILURE);
+	plat_exit(EXIT_FAILURE);
 }
 
 /* string manipulators */
