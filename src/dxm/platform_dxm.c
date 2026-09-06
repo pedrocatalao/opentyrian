@@ -41,6 +41,10 @@ void dxm_adapter_bind(const dxm_host *h)
 {
 	H = h;
 	tickOrigin = h->now();
+
+	// There is no window to lose focus: the machine is the foreground.  The
+	// game pauses while unfocused, so say so once, up front.
+	input_focus(true);
 }
 
 jmp_buf *dxm_adapter_exit_target(void)
