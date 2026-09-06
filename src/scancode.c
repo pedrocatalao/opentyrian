@@ -28,7 +28,8 @@
 #include <strings.h>
 #endif
 
-// Generated from SDL 2's SDL_GetScancodeName() for every scancode.
+// Generated from SDL_GetScancodeName() of the official SDL 2.32.10 build, for
+// every scancode, so key names in configuration files match upstream's.
 static const char *const scancodeNames[SCANCODE_COUNT] =
 {
 	[4] = "A",
@@ -127,7 +128,6 @@ static const char *const scancodeNames[SCANCODE_COUNT] =
 	[97] = "Keypad 9",
 	[98] = "Keypad 0",
 	[99] = "Keypad .",
-	[100] = "NonUSBackslash",
 	[101] = "Application",
 	[102] = "Power",
 	[103] = "Keypad =",
@@ -159,24 +159,6 @@ static const char *const scancodeNames[SCANCODE_COUNT] =
 	[129] = "VolumeDown",
 	[133] = "Keypad ,",
 	[134] = "Keypad = (AS400)",
-	[135] = "International 1",
-	[136] = "International 2",
-	[137] = "International 3",
-	[138] = "International 4",
-	[139] = "International 5",
-	[140] = "International 6",
-	[141] = "International 7",
-	[142] = "International 8",
-	[143] = "International 9",
-	[144] = "Language 1",
-	[145] = "Language 2",
-	[146] = "Language 3",
-	[147] = "Language 4",
-	[148] = "Language 5",
-	[149] = "Language 6",
-	[150] = "Language 7",
-	[151] = "Language 8",
-	[152] = "Language 9",
 	[153] = "AltErase",
 	[154] = "SysReq",
 	[155] = "Cancel",
