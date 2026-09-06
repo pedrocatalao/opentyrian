@@ -19,6 +19,7 @@
 #include "editship.h"
 
 #include "file.h"
+#include <stdlib.h>
 
 #define EXTRA_SHIPS_FILE_SIZE (sizeof(JE_ShipsType) - 4)
 

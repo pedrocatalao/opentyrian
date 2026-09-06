@@ -33,6 +33,7 @@
 #include "sprite.h"
 #include "vga256d.h"
 #include "video.h"
+#include <math.h>
 
 JE_integer tempDat, tempDat2, tempDat3;
 
@@ -381,7 +382,7 @@ JE_word JE_SGr(JE_word ship, Sprite2_array **ptr)
 
 void JE_drawOptions(void)
 {
-	SDL_Surface *temp_surface = VGAScreen;
+	Surface *temp_surface = VGAScreen;
 	VGAScreen = VGAScreenSeg;
 
 	Player *this_player = &player[twoPlayerMode ? 1 : 0];
@@ -461,7 +462,7 @@ void JE_tyrianHalt(JE_byte code)
 		logInfo("%s", "");
 	}
 
-	exit(code);
+	plat_exit(code);
 }
 
 void JE_specialComplete(JE_byte playerNum, JE_byte specialType)

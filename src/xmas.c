@@ -175,7 +175,7 @@ bool xmas_prompt(void)
 					{
 						selectedIndex = i;
 
-						if (mouseInput.button == SDL_BUTTON_LEFT &&
+						if (mouseInput.button == MOUSE_BUTTON_LEFT &&
 						    mouseInput.x >= xChoice && mouseInput.x < xChoice + wChoice &&
 							mouseInput.y >= yChoice && mouseInput.y < yChoice + hChoice)
 						{
@@ -187,7 +187,7 @@ bool xmas_prompt(void)
 				}
 			}
 
-			if (mouseInput.button == SDL_BUTTON_RIGHT)
+			if (mouseInput.button == MOUSE_BUTTON_RIGHT)
 			{
 				cancel = true;
 			}
@@ -196,27 +196,27 @@ bool xmas_prompt(void)
 		{
 			switch (keyboardInput.scancode)
 			{
-			case SDL_SCANCODE_LEFT:
+			case SCANCODE_LEFT:
 			{
 				selectedIndex = selectedIndex == 0
 					? COUNTOF(choices) - 1
 					: selectedIndex - 1;
 				break;
 			}
-			case SDL_SCANCODE_RIGHT:
+			case SCANCODE_RIGHT:
 			{
 				selectedIndex = selectedIndex == COUNTOF(choices) - 1
 					? 0
 					: selectedIndex + 1;
 				break;
 			}
-			case SDL_SCANCODE_SPACE:
-			case SDL_SCANCODE_RETURN:
+			case SCANCODE_SPACE:
+			case SCANCODE_RETURN:
 			{
 				action = true;
 				break;
 			}
-			case SDL_SCANCODE_ESCAPE:
+			case SCANCODE_ESCAPE:
 			{
 				cancel = true;
 				break;

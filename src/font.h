@@ -19,7 +19,7 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "SDL.h"
+#include "platform.h"
 
 #include <stdbool.h>
 
@@ -39,18 +39,18 @@ typedef enum
 }
 FontAlignment;
 
-void drawFontHvShadow(SDL_Surface *surface, int x, int y, const char *text, Font font, Uint8 hue, Sint8 value, bool black, int shadowDist);
-void drawFontHvFullShadow(SDL_Surface *surface, int x, int y, const char *text, Font font, Uint8 hue, Sint8 value, bool black, int shadowDist);
+void drawFontHvShadow(Surface *surface, int x, int y, const char *text, Font font, Uint8 hue, Sint8 value, bool black, int shadowDist);
+void drawFontHvFullShadow(Surface *surface, int x, int y, const char *text, Font font, Uint8 hue, Sint8 value, bool black, int shadowDist);
 
-void drawFontHv(SDL_Surface *surface, int x, int y, const char *text, Font font, Uint8 hue, Sint8 value);
-void drawFontHvBlend(SDL_Surface *surface, int x, int y, const char *text, Font font, Uint8 hue, Sint8 value);
-void drawFontDark(SDL_Surface *surface, int x, int y, const char *text, Font font, bool black);
+void drawFontHv(Surface *surface, int x, int y, const char *text, Font font, Uint8 hue, Sint8 value);
+void drawFontHvBlend(Surface *surface, int x, int y, const char *text, Font font, Uint8 hue, Sint8 value);
+void drawFontDark(Surface *surface, int x, int y, const char *text, Font font, bool black);
 
-void drawFontHvShadowAligned(SDL_Surface *surface, int x, int y, const char *text, Font, FontAlignment, Uint8 hue, Sint8 value, bool black, int shadowDist);
-void drawFontHvFullShadowAligned(SDL_Surface *surface, int x, int y, const char *text, Font, FontAlignment, Uint8 hue, Sint8 value, bool black, int shadowDist);
+void drawFontHvShadowAligned(Surface *surface, int x, int y, const char *text, Font, FontAlignment, Uint8 hue, Sint8 value, bool black, int shadowDist);
+void drawFontHvFullShadowAligned(Surface *surface, int x, int y, const char *text, Font, FontAlignment, Uint8 hue, Sint8 value, bool black, int shadowDist);
 
-void drawFontHvAligned(SDL_Surface *surface, int x, int y, const char *text, Font, FontAlignment, Uint8 hue, Sint8 value);
-void drawFontHvBlendAligned(SDL_Surface *surface, int x, int y, const char *text, Font, FontAlignment, Uint8 hue, Sint8 value);
-void drawFontDarkAligned(SDL_Surface *surface, int x, int y, const char *text, Font, FontAlignment, bool black);
+void drawFontHvAligned(Surface *surface, int x, int y, const char *text, Font, FontAlignment, Uint8 hue, Sint8 value);
+void drawFontHvBlendAligned(Surface *surface, int x, int y, const char *text, Font, FontAlignment, Uint8 hue, Sint8 value);
+void drawFontDarkAligned(Surface *surface, int x, int y, const char *text, Font, FontAlignment, bool black);
 
 #endif // FONT_H

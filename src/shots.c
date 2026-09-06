@@ -23,6 +23,7 @@
 #include "sprite.h"
 #include "video.h"
 #include "varz.h"
+#include <math.h>
 
 // I'm pretty sure the last extra entry is never used.
 PlayerShotDataType playerShotData[MAX_PWEAPON + 1]; /* [1..MaxPWeapon+1] */

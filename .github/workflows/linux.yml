@@ -85,6 +85,30 @@ jobs:
           fi
           mkdir -p pkgtest && tar -xzf "opentyrian-linux-${{ matrix.arch }}.tar.gz" -C pkgtest
           docker run --rm -v "$PWD/pkgtest:/pkg:ro" -w / debian:bookworm-slim /pkg/opentyrian/opentyrian --help
+      - name: Build the DXM core module
+        # A SEPARATE build tree: the game as DOS ex Machina loads it.  No SDL,
+        # no threads, no exit(): platform.h implemented on the host table.
+        # Compiles against the VENDORED src/dxm/dxm_core.h.
+        run: |
+          cmake -S . -B build-core -DOT_CORE=ON -DOT_MODULE=ON
+          cmake --build build-core -j"$(nproc)"
+      - name: Verify the module is self-contained
+        run: |
+          test -f build-core/opentyrian.dxm
+          if nm -D --undefined-only build-core/opentyrian.dxm | grep -E " (plat_|SDL_|pthread_|exit|atexit|getenv|signal)$"; then exit 1; fi
+          nm -D --defined-only build-core/opentyrian.dxm | grep -c " T dxm_core_" | grep -qx 3
+          echo "self-contained, 3 entry points"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: opentyrian-dxm-linux-${{ matrix.arch }}
+          path: build-core/opentyrian.dxm
+      - name: Attach module to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp build-core/opentyrian.dxm "opentyrian-linux-${{ matrix.arch }}.dxm"
+          gh release upload "${{ github.event.release.tag_name }}" "opentyrian-linux-${{ matrix.arch }}.dxm" --clobber
       - uses: actions/upload-artifact@v4
         with:
           name: opentyrian-linux-${{ matrix.arch }}

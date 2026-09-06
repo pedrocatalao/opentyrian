@@ -20,7 +20,7 @@
 
 #include "opentyr.h"
 
-#include "SDL.h"
+#include "platform.h"
 
 #include <assert.h>
 #include <ctype.h>
@@ -83,13 +83,12 @@ bool findDataFiles(void)
 	static char *baseDataDirPath = NULL;
 	if (baseDataDirPath == NULL)
 	{
-		char *basePath = SDL_GetBasePath();
+		const char *basePath = plat_base_path();
 		if (basePath != NULL)
 		{
 			size_t baseDataDirPathSize = strlen(basePath) + strlen("data") + 1;
 			baseDataDirPath = malloc(baseDataDirPathSize);
 			snprintf(baseDataDirPath, baseDataDirPathSize, "%sdata", basePath);
-			SDL_free(basePath);
 		}
 	}
 
@@ -161,6 +160,17 @@ File dataFileOpen(const char *filename, const char *mode)
 
 	File file = fileOpen(path, mode);
 
+	// The files may have been extracted with their DOS-style uppercase names.
+	if (file.error)
+	{
+		for (char *p = path + dataDirPathLen + 1; *p != '\0'; ++p)
+			*p = toupper((unsigned char)*p);
+
+		File upper = fileOpen(path, mode);
+		if (!upper.error)
+			file = upper;
+	}
+
 	free(path);
 
 	return file;
@@ -174,37 +184,20 @@ static void determineUserDirPath(void)
 		userDirPathLen = 0;
 	}
 
-#ifdef TARGET_WIN32
-	const char *appData = getenv("APPDATA");
-	if (appData != NULL)
+	// The platform decides where per-user files live; NULL means the
+	// current directory.
+	const char *prefPath = plat_pref_path();
+	if (prefPath != NULL && prefPath[0] != '\0')
 	{
-		userDirPathLen = strlen(appData) + strlen("/OpenTyrian");
-		size_t userDirPathSize = userDirPathLen + 1;
-		userDirPath = malloc(userDirPathSize);
-		snprintf(userDirPath, userDirPathSize, "%s/OpenTyrian", appData);
-		return;
-	}
-#else
-	const char *xdgConfigHome = getenv("XDG_CONFIG_HOME");
-	if (xdgConfigHome != NULL)
-	{
-		userDirPathLen = strlen(xdgConfigHome) + strlen("/opentyrian");
-		size_t userDirPathSize = userDirPathLen + 1;
-		userDirPath = malloc(userDirPathSize);
-		snprintf(userDirPath, userDirPathSize, "%s/opentyrian", xdgConfigHome);
-		return;
-	}
+		userDirPathLen = strlen(prefPath);
+		userDirPath = malloc(userDirPathLen + 1);
+		memcpy(userDirPath, prefPath, userDirPathLen + 1);
 
-	const char *home = getenv("HOME");
-	if (home != NULL)
-	{
-		userDirPathLen = strlen(home) + strlen("/.config/opentyrian");
-		size_t userDirPathSize = userDirPathLen + 1;
-		userDirPath = malloc(userDirPathSize);
-		snprintf(userDirPath, userDirPathSize, "%s/.config/opentyrian", home);
+		// Callers append "/filename"; drop a trailing separator.
+		while (userDirPathLen > 1 && (userDirPath[userDirPathLen - 1] == '/' || userDirPath[userDirPathLen - 1] == '\\'))
+			userDirPath[--userDirPathLen] = '\0';
 		return;
 	}
-#endif
 
 	userDirPath = "";
 	userDirPathLen = 0;

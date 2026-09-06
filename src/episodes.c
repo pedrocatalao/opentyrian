@@ -65,7 +65,7 @@ void JE_loadItemDat(void)
 		if (file.error)
 		{
 			logFatal("Failed to open file '%s': %s", filename, fileGetError(&file));
-			exit(EXIT_FAILURE);
+			plat_exit(EXIT_FAILURE);
 		}
 
 		long position = fileReadU32(&file);
@@ -81,7 +81,7 @@ void JE_loadItemDat(void)
 		if (file.error)
 		{
 			logFatal("Failed to open file '%s': %s", filename, fileGetError(&file));
-			exit(EXIT_FAILURE);
+			plat_exit(EXIT_FAILURE);
 		}
 
 		fileSetPosition(&file, lvlPos[lvlNum-1]);
@@ -238,7 +238,7 @@ void JE_loadItemDat(void)
 	if (file.error)
 	{
 		logFatal("Failed to read from file '%s': %s", filename, fileGetError(&file));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	fileClose(&file);

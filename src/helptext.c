@@ -105,7 +105,7 @@ void readEncryptedString(File *file, char *dst, size_t size)
 	dst[len] = '\0';
 }
 
-void JE_helpBox(SDL_Surface *screen,  int x, int y, const char *message, JE_byte boxWidth, JE_byte verticalHeight, JE_byte color, JE_byte brightness, JE_byte shadeType)
+void JE_helpBox(Surface *screen,  int x, int y, const char *message, JE_byte boxWidth, JE_byte verticalHeight, JE_byte color, JE_byte brightness, JE_byte shadeType)
 {
 	JE_byte startpos, endpos, pos;
 	JE_boolean endstring;
@@ -144,7 +144,7 @@ void JE_helpBox(SDL_Surface *screen,  int x, int y, const char *message, JE_byte
 
 		} while (!((unsigned)(pos - startpos) > boxWidth || endstring));
 
-		SDL_strlcpy(substring, message + startpos - 1, MIN((size_t)(endpos - startpos + 1), sizeof(substring)));
+		ot_strlcpy(substring, message + startpos - 1, MIN((size_t)(endpos - startpos + 1), sizeof(substring)));
 		JE_textShade(screen, x, y, substring, color, brightness, shadeType);
 
 		y += verticalHeight;
@@ -157,7 +157,7 @@ void JE_helpBox(SDL_Surface *screen,  int x, int y, const char *message, JE_byte
 	}
 }
 
-void JE_HBox(SDL_Surface *screen, int x, int y, JE_byte messageNum, JE_byte boxWidth, JE_byte verticalHeight, JE_byte color, JE_byte brightness)
+void JE_HBox(Surface *screen, int x, int y, JE_byte messageNum, JE_byte boxWidth, JE_byte verticalHeight, JE_byte color, JE_byte brightness)
 {
 	JE_helpBox(screen, x, y, helpTxt[messageNum-1], boxWidth, verticalHeight, color, brightness, FULL_SHADE);
 }
@@ -175,7 +175,7 @@ void JE_loadHelpText(void)
 	if (file.error)
 	{
 		logFatal("Failed to open file '%s': %s", filename, fileGetError(&file));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	(void)fileReadU32(&file);  // Episode 1-3 item data position
@@ -383,7 +383,7 @@ void JE_loadHelpText(void)
 	if (file.error)
 	{
 		logFatal("Failed to read from file '%s': %s", filename, fileGetError(&file));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	fileClose(&file);

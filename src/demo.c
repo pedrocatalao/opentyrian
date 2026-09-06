@@ -57,7 +57,7 @@ void beginPlayDemo(void)
 	if (demoFile.error)
 	{
 		logFatal("Failed to open file '%s': %s", demoFilename, fileGetError(&demoFile));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	mt_srand(seed);
@@ -91,7 +91,7 @@ void beginPlayDemo(void)
 	if (demoFile.error)
 	{
 		logFatal("Failed to read from demo recording file: %s", fileGetError(&demoFile));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	MemReader reader = { data, size, false };
@@ -111,7 +111,7 @@ bool playDemoKeys(void)
 		if (demoFile.error)
 		{
 			logFatal("Failed to read from demo recording file: %s", fileGetError(&demoFile));
-			exit(EXIT_FAILURE);
+			plat_exit(EXIT_FAILURE);
 		}
 
 		if (size < sizeof data)
@@ -165,7 +165,7 @@ void beginRecordDemo(void)
 		if (newDemoNum == UINT8_MAX)
 		{
 			logFatal("No more demo recording files can be created.");
-			exit(EXIT_FAILURE);
+			plat_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -175,7 +175,7 @@ void beginRecordDemo(void)
 	if (demoFile.error)
 	{
 		logFatal("Failed to open file '%s': %s", newDemoFilename, fileGetError(&demoFile));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	mt_srand(seed);
@@ -252,7 +252,7 @@ void endRecordDemo(void)
 	if (demoFile.error)
 	{
 		logFatal("Failed to write to demo recording file: %s", fileGetError(&demoFile));
-		exit(EXIT_FAILURE);
+		plat_exit(EXIT_FAILURE);
 	}
 
 	fileClose(&demoFile);

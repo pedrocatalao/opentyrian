@@ -64,6 +64,7 @@
 #include "video.h"
 
 #include <assert.h>
+#include <math.h>
 
 /*** Defines ***/
 #define UNIT_HEIGHT 12
@@ -276,7 +277,7 @@ struct destruct_moves_s
 
 struct destruct_keys_s
 {
-	SDL_Scancode Config[MAX_KEY][MAX_KEY_OPTIONS];
+	Scancode Config[MAX_KEY][MAX_KEY_OPTIONS];
 };
 
 struct destruct_ai_s
@@ -311,7 +312,7 @@ struct destruct_world_s
 {
 	/* Map data & screen pointer */
 	unsigned int baseMap[320];
-	SDL_Surface * VGAScreen;
+	Surface * VGAScreen;
 	struct destruct_wall_s * mapWalls;
 
 	/* Map configuration */
@@ -333,12 +334,12 @@ static void DE_generateBaseTerrain(unsigned int, unsigned int *);
 static void DE_drawBaseTerrain(unsigned int *);
 static void DE_generateUnits(unsigned int *);
 static void DE_generateWalls(struct destruct_world_s *);
-static void DE_generateRings(SDL_Surface *, Uint8);
+static void DE_generateRings(Surface *, Uint8);
 static void DE_ResetLevel(void);
 static unsigned int JE_placementPosition(unsigned int, unsigned int, unsigned int *);
 
 //drawing functions
-static void JE_aliasDirt(SDL_Surface *);
+static void JE_aliasDirt(Surface *);
 static void DE_RunTickDrawCrosshairs(void);
 static void DE_RunTickDrawHUD(void);
 static void DE_GravityDrawUnit(enum de_player_t, struct destruct_unit_s *);
@@ -460,32 +461,32 @@ static const JE_byte ModeScore[MAX_PLAYERS][MAX_MODES] =
 	{1, 0, 5, 0, 1, 1}
 };
 
-static SDL_Scancode defaultKeyConfig[MAX_PLAYERS][MAX_KEY][MAX_KEY_OPTIONS] =
+static Scancode defaultKeyConfig[MAX_PLAYERS][MAX_KEY][MAX_KEY_OPTIONS] =
 {
 	{
-		{SDL_SCANCODE_C},
-		{SDL_SCANCODE_V},
-		{SDL_SCANCODE_A},
-		{SDL_SCANCODE_Z},
-		{SDL_SCANCODE_LALT},
-		{SDL_SCANCODE_X, SDL_SCANCODE_LSHIFT},
-		{SDL_SCANCODE_LCTRL},
-		{SDL_SCANCODE_SPACE}
+		{SCANCODE_C},
+		{SCANCODE_V},
+		{SCANCODE_A},
+		{SCANCODE_Z},
+		{SCANCODE_LALT},
+		{SCANCODE_X, SCANCODE_LSHIFT},
+		{SCANCODE_LCTRL},
+		{SCANCODE_SPACE}
 	},
 	{
-		{SDL_SCANCODE_LEFT, SDL_SCANCODE_KP_4},
-		{SDL_SCANCODE_RIGHT, SDL_SCANCODE_KP_6},
-		{SDL_SCANCODE_UP, SDL_SCANCODE_KP_8},
-		{SDL_SCANCODE_DOWN, SDL_SCANCODE_KP_2},
-		{SDL_SCANCODE_BACKSLASH, SDL_SCANCODE_KP_5},
-		{SDL_SCANCODE_INSERT, SDL_SCANCODE_RETURN, SDL_SCANCODE_KP_0, SDL_SCANCODE_KP_ENTER},
-		{SDL_SCANCODE_PAGEUP, SDL_SCANCODE_KP_9},
-		{SDL_SCANCODE_PAGEDOWN, SDL_SCANCODE_KP_3}
+		{SCANCODE_LEFT, SCANCODE_KP_4},
+		{SCANCODE_RIGHT, SCANCODE_KP_6},
+		{SCANCODE_UP, SCANCODE_KP_8},
+		{SCANCODE_DOWN, SCANCODE_KP_2},
+		{SCANCODE_BACKSLASH, SCANCODE_KP_5},
+		{SCANCODE_INSERT, SCANCODE_RETURN, SCANCODE_KP_0, SCANCODE_KP_ENTER},
+		{SCANCODE_PAGEUP, SCANCODE_KP_9},
+		{SCANCODE_PAGEDOWN, SCANCODE_KP_3}
 	}
 };
 
 /*** Globals ***/
-static SDL_Surface *destructTempScreen;
+static Surface *destructTempScreen;
 static JE_boolean destructFirstTime;
 
 static struct destruct_config_s config = { 40, 20, 20, 40, 10, false, false, {true, false}, {true, false} };
@@ -539,7 +540,7 @@ static void load_destruct_config(Config *config_)
 	
 	section = config_find_or_add_section(config_, "destruct", NULL);
 	if (section == NULL)
-		exit(EXIT_FAILURE);  // out of memory
+		plat_exit(EXIT_FAILURE);  // out of memory
 	
 	config.alwaysalias = config_get_or_set_bool_option(section, "antialias craters", false, NO_YES);
 	
@@ -562,19 +563,19 @@ static void load_destruct_config(Config *config_)
 		section = config_find_section(config_, "destruct keyboard", player_names[p]);
 		if (section == NULL)
 			if ((section = config_add_section(config_, "destruct keyboard", player_names[p])) == NULL)
-				exit(-1);
+				plat_exit(-1);
 		
 		ConfigOption *option;
 		
 		for (int k = 0; k < MAX_KEY; ++k)
 		{
 			if ((option = config_get_or_set_option(section, key_names[k], NULL)) == NULL)
-				exit(-1);
+				plat_exit(-1);
 			
 			foreach_option_i_value(i, value, option)
 			{
-				SDL_Scancode key = SDL_GetScancodeFromName(value);
-				if (key != SDL_SCANCODE_UNKNOWN && i < COUNTOF(defaultKeyConfig[p][k]))
+				Scancode key = scancode_from_name(value);
+				if (key != SCANCODE_UNKNOWN && i < COUNTOF(defaultKeyConfig[p][k]))
 				{
 					defaultKeyConfig[p][k][i] = key;
 				}
@@ -589,14 +590,14 @@ static void load_destruct_config(Config *config_)
 			{
 				// unset remaining defaults
 				for (unsigned int i = config_get_value_count(option); i < COUNTOF(defaultKeyConfig[p][k]); ++i)
-					defaultKeyConfig[p][k][i] = SDL_SCANCODE_UNKNOWN;
+					defaultKeyConfig[p][k][i] = SCANCODE_UNKNOWN;
 			}
 			else
 			{
 				// set defaults
 				for (unsigned int i = 0; i < COUNTOF(defaultKeyConfig[p][k]); ++i)
-					if (defaultKeyConfig[p][k][i] != SDL_SCANCODE_UNKNOWN)
-						config_add_value(option, SDL_GetScancodeName(defaultKeyConfig[p][k][i]));
+					if (defaultKeyConfig[p][k][i] != SCANCODE_UNKNOWN)
+						config_add_value(option, scancode_name(defaultKeyConfig[p][k][i]));
 			}
 		}
 	}
@@ -606,7 +607,7 @@ static void load_destruct_config(Config *config_)
 	section = config_find_section(config_, "destruct custom", NULL);
 	if (section == NULL)
 		if ((section = config_add_section(config_, "destruct custom", NULL)) == NULL)
-			exit(-1);
+			plat_exit(-1);
 	
 	config.allow_custom = config_get_or_set_bool_option(section, "enable", false, NO_YES);
 	
@@ -621,7 +622,7 @@ static void load_destruct_config(Config *config_)
 		
 		snprintf(buffer, sizeof(buffer), "%s unit", player_names[p]);
 		if ((option = config_get_or_set_option(section, buffer, NULL)) == NULL)
-			exit(-1);
+			plat_exit(-1);
 		
 		foreach_option_i_value(i, value, option)
 		{
@@ -750,7 +751,7 @@ static void JE_introScreen(void)
 
 		delayUntilElapsed();
 
-		handleSdlEvents();
+		handleInputEvents();
 
 		if (keyboardGetInput(NULL))
 			break;
@@ -804,7 +805,7 @@ static enum de_mode_t JE_modeSelect(void)
 
 			delayUntilElapsed();
 
-			handleSdlEvents();
+			handleInputEvents();
 
 			if (keyboardHasInput())
 				break;
@@ -818,18 +819,18 @@ static enum de_mode_t JE_modeSelect(void)
 		{
 			switch (keyboardInput.scancode)
 			{
-			case SDL_SCANCODE_ESCAPE:
+			case SCANCODE_ESCAPE:
 			{
 				mode = MODE_NONE;
 				done = true;
 				break;
 			}
-			case SDL_SCANCODE_RETURN:
+			case SCANCODE_RETURN:
 			{
 				done = true;
 				break;
 			}
-			case SDL_SCANCODE_UP:
+			case SCANCODE_UP:
 			{
 				if (mode == MODE_FIRST)
 				{
@@ -844,7 +845,7 @@ static enum de_mode_t JE_modeSelect(void)
 				}
 				break;
 			}
-			case SDL_SCANCODE_DOWN:
+			case SCANCODE_DOWN:
 			{
 				if (mode >= MODE_LAST-1)
 				{
@@ -1114,7 +1115,7 @@ label_outer_break:
 	} while (remainWalls != 0);
 }
 
-static void DE_generateRings(SDL_Surface * screen, Uint8 pixel)
+static void DE_generateRings(Surface * screen, Uint8 pixel)
 {
 	unsigned int i, j, tempSize, rings;
 	int tempPosX1, tempPosY1, tempPosX2, tempPosY2;
@@ -1141,7 +1142,7 @@ static void DE_generateRings(SDL_Surface * screen, Uint8 pixel)
 	}
 }
 
-static unsigned int aliasDirtPixel(const SDL_Surface * screen, unsigned int x, unsigned int y, const Uint8 * s)
+static unsigned int aliasDirtPixel(const Surface * screen, unsigned int x, unsigned int y, const Uint8 * s)
 {
 	//A helper function used when aliasing dirt.  That's a messy process;
 	//let's contain the mess here.
@@ -1161,7 +1162,7 @@ static unsigned int aliasDirtPixel(const SDL_Surface * screen, unsigned int x, u
 	return PIXEL_BLACK;
 }
 
-static void JE_aliasDirt(SDL_Surface * screen)
+static void JE_aliasDirt(Surface * screen)
 {
 	/* This complicated looking function goes through the whole screen
 	 * looking for brown pixels which just happen to be next to non-brown
@@ -1412,7 +1413,7 @@ static void JE_helpScreen(void)
 
 		delayUntilElapsed();
 
-		handleSdlEvents();
+		handleInputEvents();
 
 		if (keyboardGetInput(NULL))
 			break;
@@ -1439,7 +1440,7 @@ static void JE_pauseScreen(void)
 
 		delayUntilElapsed();
 
-		handleSdlEvents();
+		handleInputEvents();
 
 		if (keyboardGetInput(NULL))
 			break;
@@ -1600,37 +1601,37 @@ static enum de_state_t DE_RunTick(void)
 
 	keyboardClearInput();
 
-	if (keysactive[SDL_SCANCODE_F10])
+	if (keysactive[SCANCODE_F10])
 	{
 		destruct_player[PLAYER_LEFT].is_cpu = !destruct_player[PLAYER_LEFT].is_cpu;
-		keysactive[SDL_SCANCODE_F10] = false;
+		keysactive[SCANCODE_F10] = false;
 	}
-	if (keysactive[SDL_SCANCODE_F11])
+	if (keysactive[SCANCODE_F11])
 	{
 		destruct_player[PLAYER_RIGHT].is_cpu = !destruct_player[PLAYER_RIGHT].is_cpu;
-		keysactive[SDL_SCANCODE_F11] = false;
+		keysactive[SCANCODE_F11] = false;
 	}
-	if (keysactive[SDL_SCANCODE_P])
+	if (keysactive[SCANCODE_P])
 	{
 		JE_pauseScreen();
-		keysactive[SDL_SCANCODE_P] = false;
+		keysactive[SCANCODE_P] = false;
 	}
 
-	if (keysactive[SDL_SCANCODE_F1])
+	if (keysactive[SCANCODE_F1])
 	{
 		JE_helpScreen();
-		keysactive[SDL_SCANCODE_F1] = false;
+		keysactive[SCANCODE_F1] = false;
 	}
 
-	if (keysactive[SDL_SCANCODE_ESCAPE])
+	if (keysactive[SCANCODE_ESCAPE])
 	{
-		keysactive[SDL_SCANCODE_ESCAPE] = false;
+		keysactive[SCANCODE_ESCAPE] = false;
 		return STATE_INIT; /* STATE_INIT drops us to the mode select */
 	}
 
-	if (keysactive[SDL_SCANCODE_BACKSPACE])
+	if (keysactive[SCANCODE_BACKSPACE])
 	{
-		keysactive[SDL_SCANCODE_BACKSPACE] = false;
+		keysactive[SCANCODE_BACKSPACE] = false;
 		return STATE_RELOAD; /* STATE_RELOAD creates a new map */
 	}
 
@@ -2361,14 +2362,14 @@ static void DE_RunTickDrawHUD(void)
 static void DE_RunTickGetInput(void)
 {
 	unsigned int player_index, key_index, slot_index;
-	SDL_Scancode key;
+	Scancode key;
 
 	/* destruct_player.keys holds our key config.  Players will eventually be
 	 * allowed to can change their key mappings.  destruct_player.moves and
 	 * destruct_player.keys line up; rather than manually checking left and
 	 * right we can just loop through the indexes and set the actions as
 	 * needed. */
-	handleSdlEvents();
+	handleInputEvents();
 
 	for (player_index = 0; player_index < MAX_PLAYERS; player_index++)
 	{
@@ -2377,7 +2378,7 @@ static void DE_RunTickGetInput(void)
 			for (slot_index = 0; slot_index < MAX_KEY_OPTIONS; slot_index++)
 			{
 				key = destruct_player[player_index].keys.Config[key_index][slot_index];
-				if (key == SDL_SCANCODE_UNKNOWN)
+				if (key == SCANCODE_UNKNOWN)
 					break;
 				if (keysactive[key] == true)
 				{

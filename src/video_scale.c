@@ -21,23 +21,22 @@
  */
 #include "video_scale.h"
 
-#include "palette.h"
 #include "video.h"
 
 #include <assert.h>
 #include <string.h>
 
-static void nn_32(SDL_Surface *src_surface, SDL_Texture *dst_texture);
-static void nn_16(SDL_Surface *src_surface, SDL_Texture *dst_texture);
+static void nn_32(Surface *src_surface, SDL_Texture *dst_texture);
+static void nn_16(Surface *src_surface, SDL_Texture *dst_texture);
 
-static void scale2x_32(SDL_Surface *src_surface, SDL_Texture *dst_texture);
-static void scale2x_16(SDL_Surface *src_surface, SDL_Texture *dst_texture);
-static void scale3x_32(SDL_Surface *src_surface, SDL_Texture *dst_texture);
-static void scale3x_16(SDL_Surface *src_surface, SDL_Texture *dst_texture);
+static void scale2x_32(Surface *src_surface, SDL_Texture *dst_texture);
+static void scale2x_16(Surface *src_surface, SDL_Texture *dst_texture);
+static void scale3x_32(Surface *src_surface, SDL_Texture *dst_texture);
+static void scale3x_16(Surface *src_surface, SDL_Texture *dst_texture);
 
-void hq2x_32(SDL_Surface *src_surface, SDL_Texture *dst_texture);
-void hq3x_32(SDL_Surface *src_surface, SDL_Texture *dst_texture);
-void hq4x_32(SDL_Surface *src_surface, SDL_Texture *dst_texture);
+void hq2x_32(Surface *src_surface, SDL_Texture *dst_texture);
+void hq3x_32(Surface *src_surface, SDL_Texture *dst_texture);
+void hq4x_32(Surface *src_surface, SDL_Texture *dst_texture);
 
 uint scaler;
 
@@ -55,6 +54,11 @@ const struct Scalers scalers[] =
 };
 const uint scalers_count = COUNTOF(scalers);
 
+const char *scaler_name(uint i)
+{
+	return i < scalers_count ? scalers[i].name : "";
+}
+
 void set_scaler_by_name(const char *name)
 {
 	for (uint i = 0; i < scalers_count; ++i)
@@ -67,7 +71,7 @@ void set_scaler_by_name(const char *name)
 	}
 }
 
-void nn_32(SDL_Surface *src_surface, SDL_Texture *dst_texture)
+void nn_32(Surface *src_surface, SDL_Texture *dst_texture)
 {
 	Uint8 *src = src_surface->pixels, *src_temp;
 	Uint8 *dst, *dst_temp;
@@ -116,7 +120,7 @@ void nn_32(SDL_Surface *src_surface, SDL_Texture *dst_texture)
 	SDL_UnlockTexture(dst_texture);
 }
 
-void nn_16(SDL_Surface *src_surface, SDL_Texture *dst_texture)
+void nn_16(Surface *src_surface, SDL_Texture *dst_texture)
 {
 	Uint8 *src = src_surface->pixels, *src_temp;
 	Uint8 *dst, *dst_temp;
@@ -165,7 +169,7 @@ void nn_16(SDL_Surface *src_surface, SDL_Texture *dst_texture)
 	SDL_UnlockTexture(dst_texture);
 }
 
-void scale2x_32(SDL_Surface *src_surface, SDL_Texture *dst_texture)
+void scale2x_32(Surface *src_surface, SDL_Texture *dst_texture)
 {
 	Uint8 *src = src_surface->pixels, *src_temp;
 	Uint8 *dst, *dst_temp;
@@ -228,7 +232,7 @@ void scale2x_32(SDL_Surface *src_surface, SDL_Texture *dst_texture)
 	SDL_UnlockTexture(dst_texture);
 }
 
-void scale2x_16(SDL_Surface *src_surface, SDL_Texture *dst_texture)
+void scale2x_16(Surface *src_surface, SDL_Texture *dst_texture)
 {
 	Uint8 *src = src_surface->pixels, *src_temp;
 	Uint8 *dst, *dst_temp;
@@ -291,7 +295,7 @@ void scale2x_16(SDL_Surface *src_surface, SDL_Texture *dst_texture)
 	SDL_UnlockTexture(dst_texture);
 }
 
-void scale3x_32(SDL_Surface *src_surface, SDL_Texture *dst_texture)
+void scale3x_32(Surface *src_surface, SDL_Texture *dst_texture)
 {
 	Uint8 *src = src_surface->pixels, *src_temp;
 	Uint8 *dst, *dst_temp;
@@ -368,7 +372,7 @@ void scale3x_32(SDL_Surface *src_surface, SDL_Texture *dst_texture)
 	SDL_UnlockTexture(dst_texture);
 }
 
-void scale3x_16(SDL_Surface *src_surface, SDL_Texture *dst_texture)
+void scale3x_16(Surface *src_surface, SDL_Texture *dst_texture)
 {
 	Uint8 *src = src_surface->pixels, *src_temp;
 	Uint8 *dst, *dst_temp;

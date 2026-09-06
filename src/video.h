@@ -19,7 +19,7 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
-#include "SDL.h"
+#include "platform.h"
 
 #include <stdbool.h>
 
@@ -39,28 +39,28 @@ extern const char *const scaling_mode_names[ScalingMode_MAX];
 extern int fullscreen_display; // -1 means windowed
 extern ScalingMode scaling_mode;
 
-extern SDL_Surface *VGAScreen, *VGAScreenSeg;
-extern SDL_Surface *game_screen;
-extern SDL_Surface *VGAScreen2;
+extern Surface *VGAScreen, *VGAScreenSeg;
+extern Surface *game_screen;
+extern Surface *VGAScreen2;
 
-extern SDL_Window *main_window;
-extern SDL_PixelFormat *main_window_tex_format;
-
+// Shared (video.c): the 320x200 surfaces the game draws into.
 void init_video(void);
+void deinit_video(void);
 
-void video_on_win_resize(void);
+void JE_clr256(Surface *);
+void JE_showVGA(void);
+
+// Display setup, implemented by the platform: the SDL window (video_sdl.c)
+// or no-ops for a host that owns the display (dxm/video_stub.c).
+// The software scalers the platform offers, by index; the DXM core has one.
+extern uint scaler;
+extern const uint scalers_count;
+const char *scaler_name(uint i);
+void set_scaler_by_name(const char *name);
+
 void reinit_fullscreen(int new_display);
 void toggle_fullscreen(void);
 bool init_scaler(unsigned int new_scaler);
 bool set_scaling_mode_by_name(const char *name);
-
-void deinit_video(void);
-
-void JE_clr256(SDL_Surface *);
-void JE_showVGA(void);
-
-void mapScreenPointToWindow(Sint32 *inout_x, Sint32 *inout_y);
-void mapWindowPointToScreen(Sint32 *inout_x, Sint32 *inout_y);
-void scaleWindowDistanceToScreen(Sint32 *inout_x, Sint32 *inout_y);
 
 #endif /* VIDEO_H */

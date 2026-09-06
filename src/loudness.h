@@ -30,6 +30,10 @@ extern bool audio_disabled, music_disabled, samples_disabled;
 bool init_audio(void);
 void deinit_audio(void);
 
+// Mix the next samples of music and sound effects: mono, signed 16-bit, at
+// audioSampleRate.  Called by the platform from its audio thread.
+void audio_render(Sint16 *samples, int samplesCount);
+
 void play_song(unsigned int song_num);
 void restart_song(void);
 void stop_song(void);

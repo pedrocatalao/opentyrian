@@ -30,7 +30,6 @@
 #include "player.h"
 #include "varz.h"
 #include "video.h"
-#include "video_scale.h"
 
 #define SAVE_FILES_SIZE (109 * SAVE_FILES_NUM)
 #define SAVE_FILE_SIZE (SAVE_FILES_SIZE + 100)
@@ -44,14 +43,14 @@ static const Uint8 cryptKey[10] /* [1..10] */ =
 
 const KeySettings defaultKeySettings =
 {
-	SDL_SCANCODE_UP,
-	SDL_SCANCODE_DOWN,
-	SDL_SCANCODE_LEFT,
-	SDL_SCANCODE_RIGHT,
-	SDL_SCANCODE_SPACE,
-	SDL_SCANCODE_RETURN,
-	SDL_SCANCODE_LCTRL,
-	SDL_SCANCODE_LALT,
+	SCANCODE_UP,
+	SCANCODE_DOWN,
+	SCANCODE_LEFT,
+	SCANCODE_RIGHT,
+	SCANCODE_SPACE,
+	SCANCODE_RETURN,
+	SCANCODE_LCTRL,
+	SCANCODE_LALT,
 };
 
 static const char *const keySettingNames[] =
@@ -299,8 +298,8 @@ static void loadOpenTyrianConfig(void)
 			const char *keyName;
 			if (config_get_string_option(section, keySettingNames[i], &keyName))
 			{
-				SDL_Scancode scancode = SDL_GetScancodeFromName(keyName);
-				if (scancode != SDL_SCANCODE_UNKNOWN)
+				Scancode scancode = scancode_from_name(keyName);
+				if (scancode != SCANCODE_UNKNOWN)
 					keySettings[i] = scancode;
 			}
 		}
@@ -315,21 +314,21 @@ static void saveOpenTyrianConfig(void)
 	
 	section = config_find_or_add_section(config, "video", NULL);
 	if (section == NULL)
-		exit(EXIT_FAILURE);  // out of memory
+		plat_exit(EXIT_FAILURE);  // out of memory
 	
 	config_set_int_option(section, "fullscreen", fullscreen_display);
 	
-	config_set_string_option(section, "scaler", scalers[scaler].name);
+	config_set_string_option(section, "scaler", scaler_name(scaler));
 	
 	config_set_string_option(section, "scaling_mode", scaling_mode_names[scaling_mode]);
 
 	section = config_find_or_add_section(config, "keyboard", NULL);
 	if (section == NULL)
-		exit(EXIT_FAILURE);  // out of memory
+		plat_exit(EXIT_FAILURE);  // out of memory
 
 	for (size_t i = 0; i < COUNTOF(keySettings); ++i)
 	{
-		const char *keyName = SDL_GetScancodeName(keySettings[i]);
+		const char *keyName = scancode_name(keySettings[i]);
 		if (keyName[0] == '\0')
 			keyName = NULL;
 		config_set_string_option(section, keySettingNames[i], keyName);

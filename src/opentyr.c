@@ -47,10 +47,9 @@
 #include "varz.h"
 #include "vga256d.h"
 #include "video.h"
-#include "video_scale.h"
 #include "xmas.h"
 
-#include "SDL.h"
+#include "platform.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -63,7 +62,7 @@ const char *opentyrian_version = OPENTYRIAN_VERSION;
 
 static size_t getDisplayPickerItemsCount(void)
 {
-	return 1 + (size_t)SDL_GetNumVideoDisplays();
+	return 1 + (size_t)plat_display_count();
 }
 
 static const char *getDisplayPickerItem(size_t i, char *buffer, size_t bufferSize)
@@ -84,7 +83,7 @@ static const char *getScalerPickerItem(size_t i, char *buffer, size_t bufferSize
 {
 	(void)buffer, (void)bufferSize;
 
-	return scalers[i].name;
+	return scaler_name(i);
 }
 
 static size_t getScalingModePickerItemsCount(void)
@@ -258,7 +257,7 @@ void setupMenu(void)
 				break;
 
 			case MENU_ITEM_SCALER:
-				drawFontHvShadow(VGAScreen, xMenuItemValue, y, scalers[scaler].name, FONT_NORMAL, 15, -3 + (selected ? 2 : 0) + (disabled ? -4 : 0), false, 2);
+				drawFontHvShadow(VGAScreen, xMenuItemValue, y, scaler_name(scaler), FONT_NORMAL, 15, -3 + (selected ? 2 : 0) + (disabled ? -4 : 0), false, 2);
 				break;
 
 			case MENU_ITEM_SCALING_MODE:
@@ -365,7 +364,7 @@ void setupMenu(void)
 								*selectedMenuItemIndex = i;
 							}
 
-							if (mouseInput.button == SDL_BUTTON_LEFT &&
+							if (mouseInput.button == MOUSE_BUTTON_LEFT &&
 							    mouseInput.y >= yMenuItem && mouseInput.y < yMenuItem + hMenuItem)
 							{
 								// Act on menu item via name.
@@ -417,7 +416,7 @@ void setupMenu(void)
 					}
 				}
 
-				if (mouseInput.button == SDL_BUTTON_RIGHT)
+				if (mouseInput.button == MOUSE_BUTTON_RIGHT)
 				{
 					JE_playSampleNum(S_SPRING);
 
@@ -428,7 +427,7 @@ void setupMenu(void)
 			{
 				switch (keyboardInput.scancode)
 				{
-				case SDL_SCANCODE_UP:
+				case SCANCODE_UP:
 				{
 					JE_playSampleNum(S_CURSOR);
 
@@ -437,7 +436,7 @@ void setupMenu(void)
 						: *selectedMenuItemIndex - 1;
 					break;
 				}
-				case SDL_SCANCODE_DOWN:
+				case SCANCODE_DOWN:
 				{
 					JE_playSampleNum(S_CURSOR);
 
@@ -446,7 +445,7 @@ void setupMenu(void)
 						: *selectedMenuItemIndex + 1;
 					break;
 				}
-				case SDL_SCANCODE_LEFT:
+				case SCANCODE_LEFT:
 				{
 					switch (menuItems[*selectedMenuItemIndex].id)
 					{
@@ -469,7 +468,7 @@ void setupMenu(void)
 					}
 					break;
 				}
-				case SDL_SCANCODE_RIGHT:
+				case SCANCODE_RIGHT:
 				{
 					switch (menuItems[*selectedMenuItemIndex].id)
 					{
@@ -492,13 +491,13 @@ void setupMenu(void)
 					}
 					break;
 				}
-				case SDL_SCANCODE_SPACE:
-				case SDL_SCANCODE_RETURN:
+				case SCANCODE_SPACE:
+				case SCANCODE_RETURN:
 				{
 					action = true;
 					break;
 				}
-				case SDL_SCANCODE_ESCAPE:
+				case SCANCODE_ESCAPE:
 				{
 					JE_playSampleNum(S_SPRING);
 
@@ -647,7 +646,7 @@ void setupMenu(void)
 							}
 
 							// Act on picker item.
-							if (mouseInput.button == SDL_BUTTON_LEFT &&
+							if (mouseInput.button == MOUSE_BUTTON_LEFT &&
 							    mouseInput.x >= xMenuItemValue && mouseInput.y < xMenuItemValue + wMenuItemName &&
 							    mouseInput.y >= yPickerItem && mouseInput.y < yPickerItem + hPickerItem)
 							{
@@ -657,7 +656,7 @@ void setupMenu(void)
 					}
 				}
 
-				if (mouseInput.button == SDL_BUTTON_RIGHT)
+				if (mouseInput.button == MOUSE_BUTTON_RIGHT)
 				{
 					JE_playSampleNum(S_SPRING);
 
@@ -668,7 +667,7 @@ void setupMenu(void)
 			{
 				switch (keyboardInput.scancode)
 				{
-				case SDL_SCANCODE_UP:
+				case SCANCODE_UP:
 				{
 					JE_playSampleNum(S_CURSOR);
 
@@ -679,7 +678,7 @@ void setupMenu(void)
 						: pickerSelectedIndex - 1;
 					break;
 				}
-				case SDL_SCANCODE_DOWN:
+				case SCANCODE_DOWN:
 				{
 					JE_playSampleNum(S_CURSOR);
 
@@ -690,13 +689,13 @@ void setupMenu(void)
 						: pickerSelectedIndex + 1;
 					break;
 				}
-				case SDL_SCANCODE_SPACE:
-				case SDL_SCANCODE_RETURN:
+				case SCANCODE_SPACE:
+				case SCANCODE_RETURN:
 				{
 					action = true;
 					break;
 				}
-				case SDL_SCANCODE_ESCAPE:
+				case SCANCODE_ESCAPE:
 				{
 					JE_playSampleNum(S_SPRING);
 
@@ -728,7 +727,7 @@ void setupMenu(void)
 						if (!init_scaler(pickerSelectedIndex) &&  // try new scaler
 							!init_scaler(oldScaler))              // revert on fail
 						{
-							exit(EXIT_FAILURE);
+							plat_exit(EXIT_FAILURE);
 						}
 					}
 					break;
@@ -748,12 +747,8 @@ void setupMenu(void)
 	}
 }
 
-int main(int argc, char *argv[])
+int opentyrian_main(int argc, char *argv[])
 {
-#ifndef NDEBUG
-	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
-#endif
-
 	mt_srand(time(NULL));
 
 	logInfo("%s", "");
@@ -765,14 +760,6 @@ int main(int argc, char *argv[])
 	logInfo("This is free software, and you are welcome to redistribute it");
 	logInfo("under certain conditions.  See the file COPYING for details.");
 	logInfo("%s", "");
-
-	if (SDL_Init(0) != 0)
-	{
-		logFatal("Failed to initialize SDL: %s", SDL_GetError());
-		return EXIT_FAILURE;
-	}
-
-	atexit(SDL_Quit);
 
 	loadConfiguration();
 	loadSaves();

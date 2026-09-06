@@ -37,3 +37,4 @@ tyrian.sav
 
 # Release build scripts output (make_mac.sh, make_linux.sh)
 /build/
+/build-core/
