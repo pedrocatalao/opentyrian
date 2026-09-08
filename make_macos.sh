@@ -1,9 +1,9 @@
 #!/bin/bash
-# make_mac.sh — build a self-contained, universal OpenTyrian.app (macOS).
+# make_macos.sh — build a self-contained, universal OpenTyrian.app (macOS).
 # Bundles the official SDL2.framework and the freeware Tyrian 2.1 data, so
 # the app runs on any Mac with nothing installed.
 #
-# Usage: ./make_mac.sh [data-dir]     (default: ./data, fetched if missing)
+# Usage: ./make_macos.sh [data-dir]     (default: ./data, fetched if missing)
 set -euo pipefail
 
 cd "$(dirname "$0")"
@@ -13,7 +13,7 @@ have_data() { find "$1" -maxdepth 1 -iname "tyrian1.lvl" 2>/dev/null | grep -q .
 
 if ! have_data "$DATA_ARG" && [ "$#" -ge 1 ]; then
     echo "ERROR: no Tyrian data in '$DATA_ARG'" >&2
-    echo "Point make_mac.sh at your Tyrian 2.1 data, or run it with no argument" >&2
+    echo "Point make_macos.sh at your Tyrian 2.1 data, or run it with no argument" >&2
     echo "to download the freeware release into ./data automatically." >&2
     exit 1
 fi
@@ -69,7 +69,7 @@ cat > "$OUT/Contents/Info.plist" <<PLIST
 <plist version="1.0">
 <dict>
     <key>CFBundleExecutable</key>      <string>opentyrian</string>
-    <key>CFBundleIdentifier</key>      <string>org.opentyrian.OpenTyrian</string>
+    <key>CFBundleIdentifier</key>      <string>io.github.opentyrian.OpenTyrian</string>
     <key>CFBundleName</key>            <string>OpenTyrian</string>
     <key>CFBundleDisplayName</key>     <string>OpenTyrian</string>
     <key>CFBundlePackageType</key>     <string>APPL</string>

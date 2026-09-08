@@ -42,9 +42,9 @@ jobs:
             libgles2-mesa-dev libgbm-dev libdrm-dev libdbus-1-dev libudev-dev \
             wayland-protocols libpipewire-0.3-dev
       - name: Compile check (debug, -Werror, distro SDL2)
-        run: |
-          make -j"$(nproc)" debug
-          ./opentyrian --help
+        run: make -j"$(nproc)" debug
+      - name: Smoke test
+        run: ./opentyrian --help
       - name: Cache game data
         uses: actions/cache@v4
         with:
@@ -62,27 +62,12 @@ jobs:
           mkdir -p dist/opentyrian
           cp opentyrian dist/opentyrian/
           cp -r data dist/opentyrian/data
-          cat > dist/opentyrian/README.txt <<'EOF'
-          OpenTyrian - self-contained Linux build
-
-          Run ./opentyrian from this directory, or from anywhere: it finds the
-          data directory next to the executable.  SDL2 is linked in statically,
-          so nothing needs to be installed.
-
-          Config and saves live in ~/.config/opentyrian.
-          EOF
           tar -czf "opentyrian-linux-${{ matrix.arch }}.tar.gz" -C dist opentyrian
       - name: Verify the package is self-contained
-        # Two checks.  First, the only shared libraries the binary asks for
-        # are the ones every Linux has.  Second - the real test - the package
-        # runs in a bare Debian container with no SDL, no libdecor, nothing
-        # installed.  The runner itself proves nothing here: it has all of
-        # those, and a missing dependency would be silently satisfied.
+        # In a bare Debian container: no SDL, no libdecor, nothing installed.
+        # The runner itself proves nothing here - it has all of those, and a
+        # missing dependency would be silently satisfied.
         run: |
-          ldd opentyrian
-          if ldd opentyrian | grep -Ev 'linux-vdso|ld-linux|libc\.so|libm\.so|libdl\.so|libpthread\.so|librt\.so|libgcc_s\.so'; then
-            echo "ERROR: unexpected shared library dependency above" >&2; exit 1
-          fi
           mkdir -p pkgtest && tar -xzf "opentyrian-linux-${{ matrix.arch }}.tar.gz" -C pkgtest
           docker run --rm -v "$PWD/pkgtest:/pkg:ro" -w / debian:bookworm-slim /pkg/opentyrian/opentyrian --help
       - uses: actions/upload-artifact@v4

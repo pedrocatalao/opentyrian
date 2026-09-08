@@ -46,8 +46,12 @@ gamesdir ?= $(datadir)/games
 ###
 
 TARGET := opentyrian
+RES :=
 ifeq ($(PLATFORM), WIN32)
     TARGET := opentyrian.exe
+    # The icon, from the same resource script the Visual Studio build uses.
+    WINDRES ?= windres
+    RES := obj/resources.o
 endif
 
 SRCS := $(wildcard src/*.c)
@@ -166,9 +170,10 @@ uninstall :
 clean :
 	rm -f $(OBJS)
 	rm -f $(DEPS)
+	rm -f $(RES)
 	rm -f $(TARGET)
 
-$(TARGET) : $(OBJS)
+$(TARGET) : $(OBJS) $(RES)
 	$(CC) $(ALL_CFLAGS) $(ALL_LDFLAGS) -o $@ $^ $(ALL_LDLIBS)
 
 -include $(DEPS)
@@ -176,3 +181,7 @@ $(TARGET) : $(OBJS)
 obj/%.o : src/%.c
 	@mkdir -p "$(dir $@)"
 	$(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c -o $@ $<
+
+obj/resources.o : visualc/resources.rc visualc/tyrian.ico
+	@mkdir -p "$(dir $@)"
+	$(WINDRES) --include-dir visualc -i $< -o $@

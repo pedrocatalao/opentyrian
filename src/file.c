@@ -99,7 +99,6 @@ bool findDataFiles(void)
 #ifdef TYRIAN_DIR
 		TYRIAN_DIR,
 #endif
-		"data",
 	};
 
 	for (size_t i = 0; i < COUNTOF(dataDirPaths); ++i)

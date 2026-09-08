@@ -51,7 +51,6 @@ searched in order:
    for the macOS app)
 3. the system directory the build was configured with
    (`/usr/local/share/games/tyrian` by default; `C:\TYRIAN` on Windows)
-4. a `data` directory in the current working directory
 
 `./get_data.sh [dir]` downloads and extracts them for you.  Filenames in the
 archive may be uppercase; the script lowercases them, as does
@@ -73,7 +72,7 @@ A Visual Studio solution is in `visualc/`.
 
 The self-contained release builds are produced by the same scripts CI uses:
 
-    ./make_mac.sh      # universal OpenTyrian.app in build/, SDL2.framework bundled
+    ./make_macos.sh      # universal OpenTyrian.app in build/, SDL2.framework bundled
     ./make_linux.sh    # SDL2 built from source and linked statically
     ./get_data.sh      # fetches the game data into data/ (both scripts call it)
 

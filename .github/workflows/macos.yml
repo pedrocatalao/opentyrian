@@ -30,7 +30,7 @@ jobs:
           path: data
           key: tyrian21-data-v1
       - name: Build OpenTyrian.app (universal, bundled SDL2 + game data)
-        run: ./make_mac.sh
+        run: ./make_macos.sh
       - name: Verify the bundle
         run: |
           lipo -archs build/OpenTyrian.app/Contents/MacOS/opentyrian | grep -q "x86_64 arm64"
