@@ -41,6 +41,19 @@ SDL2_NET_VER="2.2.0"
 PREFIX="$PWD/build/sdl"
 NPROC="$(nproc 2>/dev/null || echo 4)"
 
+# The licence of anything we link in has to travel with the binary.  Keep the
+# copies inside the prefix, since that is what CI caches: on a cache hit the
+# source trees below are never unpacked.
+install_license() {  # $1 = source directory, $2 = name in the package
+    src=$(ls "$1"/LICENSE.txt "$1"/LICENSE "$1"/COPYING.txt "$1"/COPYING 2>/dev/null | head -1)
+    if [ -z "$src" ]; then
+        echo "ERROR: no licence file found in $1" >&2
+        exit 1
+    fi
+    mkdir -p "$PREFIX/share/licenses"
+    cp "$src" "$PREFIX/share/licenses/$2.txt"
+}
+
 if [ ! -f "$PREFIX/lib/libSDL2.a" ]; then
     echo "Building SDL2 $SDL2_VER (static) ..."
     mkdir -p build/vendor
@@ -53,6 +66,7 @@ if [ ! -f "$PREFIX/lib/libSDL2.a" ]; then
         -DSDL_SHARED=OFF -DSDL_STATIC=ON -DSDL_STATIC_PIC=ON -DSDL_TEST=OFF >/dev/null
     cmake --build "build/vendor/SDL2-$SDL2_VER/build" -j"$NPROC" >/dev/null
     cmake --install "build/vendor/SDL2-$SDL2_VER/build" >/dev/null
+    install_license "build/vendor/SDL2-$SDL2_VER" SDL2
 fi
 
 if [ ! -f "$PREFIX/lib/libSDL2_net.a" ]; then
@@ -67,6 +81,7 @@ if [ ! -f "$PREFIX/lib/libSDL2_net.a" ]; then
         -DBUILD_SHARED_LIBS=OFF -DSDL2NET_SAMPLES=OFF >/dev/null
     cmake --build "build/vendor/SDL2_net-$SDL2_NET_VER/build" -j"$NPROC" >/dev/null
     cmake --install "build/vendor/SDL2_net-$SDL2_NET_VER/build" >/dev/null
+    install_license "build/vendor/SDL2_net-$SDL2_NET_VER" SDL2_net
 fi
 
 # ---- the game, against the static SDL ----

@@ -57,11 +57,19 @@ jobs:
         run: ./opentyrian.exe --help
       - name: Package (exe + DLLs + game data)
         run: |
-          mkdir -p dist/opentyrian
+          mkdir -p dist/opentyrian/licenses
           cp opentyrian.exe dist/opentyrian/
           # bundle every non-system DLL the exe needs (SDL2, SDL2_net, compiler runtime)
           ldd opentyrian.exe | grep -iv "system32\|/c/windows" | awk '{print $3}' | sort -u | xargs -I{} cp {} dist/opentyrian/
           cp -r data dist/opentyrian/data
+          cp COPYING dist/opentyrian/COPYING.txt
+          cp doc/tyrian-data-license.txt dist/opentyrian/licenses/tyrian-data.txt
+          for pkg in SDL2 SDL2_net; do
+            lic=$(find "$MINGW_PREFIX/share/licenses/$pkg" "$MINGW_PREFIX/share/doc/$pkg" \
+                       -maxdepth 1 -type f \( -iname 'license*' -o -iname 'copying*' \) 2>/dev/null | head -1)
+            if [ -z "$lic" ]; then echo "ERROR: no licence file found for $pkg" >&2; exit 1; fi
+            cp "$lic" "dist/opentyrian/licenses/$pkg.txt"
+          done
           cd dist && zip -r "../opentyrian-windows-${{ matrix.arch }}.zip" opentyrian
       - name: Extract the package
         run: mkdir -p /tmp/pkgtest && unzip -q "opentyrian-windows-${{ matrix.arch }}.zip" -d /tmp/pkgtest
