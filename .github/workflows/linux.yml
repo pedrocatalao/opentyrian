@@ -63,13 +63,13 @@ jobs:
           cp opentyrian dist/opentyrian/
           cp -r data dist/opentyrian/data
           tar -czf "opentyrian-linux-${{ matrix.arch }}.tar.gz" -C dist opentyrian
+      - name: Extract the package
+        run: mkdir -p pkgtest && tar -xzf "opentyrian-linux-${{ matrix.arch }}.tar.gz" -C pkgtest
       - name: Verify the package is self-contained
         # In a bare Debian container: no SDL, no libdecor, nothing installed.
         # The runner itself proves nothing here - it has all of those, and a
         # missing dependency would be silently satisfied.
-        run: |
-          mkdir -p pkgtest && tar -xzf "opentyrian-linux-${{ matrix.arch }}.tar.gz" -C pkgtest
-          docker run --rm -v "$PWD/pkgtest:/pkg:ro" -w / debian:bookworm-slim /pkg/opentyrian/opentyrian --help
+        run: docker run --rm -v "$PWD/pkgtest:/pkg:ro" -w / debian:bookworm-slim /pkg/opentyrian/opentyrian --help
       - uses: actions/upload-artifact@v7
         with:
           name: opentyrian-linux-${{ matrix.arch }}

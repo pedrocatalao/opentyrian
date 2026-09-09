@@ -39,9 +39,9 @@ jobs:
             ${{ matrix.prefix }}-SDL2
             ${{ matrix.prefix }}-SDL2_net
       - name: Compile check (debug, -Werror)
-        run: |
-          make -j"$(nproc)" debug
-          ./opentyrian.exe --help
+        run: make -j"$(nproc)" debug
+      - name: Smoke test
+        run: ./opentyrian.exe --help
       - name: Cache game data
         uses: actions/cache@v6
         with:
@@ -63,10 +63,10 @@ jobs:
           ldd opentyrian.exe | grep -iv "system32\|/c/windows" | awk '{print $3}' | sort -u | xargs -I{} cp {} dist/opentyrian/
           cp -r data dist/opentyrian/data
           cd dist && zip -r "../opentyrian-windows-${{ matrix.arch }}.zip" opentyrian
+      - name: Extract the package
+        run: mkdir -p /tmp/pkgtest && unzip -q "opentyrian-windows-${{ matrix.arch }}.zip" -d /tmp/pkgtest
       - name: Verify the package runs from a clean directory
-        run: |
-          mkdir -p /tmp/pkgtest && unzip -q "opentyrian-windows-${{ matrix.arch }}.zip" -d /tmp/pkgtest
-          cd / && /tmp/pkgtest/opentyrian/opentyrian.exe --help
+        run: cd / && /tmp/pkgtest/opentyrian/opentyrian.exe --help
       - uses: actions/upload-artifact@v7
         with:
           name: opentyrian-windows-${{ matrix.arch }}
