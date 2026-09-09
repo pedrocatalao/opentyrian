@@ -20,6 +20,7 @@ SHELL = /bin/sh
 CC ?= gcc
 INSTALL ?= install
 PKG_CONFIG ?= pkg-config
+WINDRES ?= windres
 
 VCS_IDREV ?= (git describe --tags || git rev-parse --short HEAD)
 
@@ -50,7 +51,6 @@ RES :=
 ifeq ($(PLATFORM), WIN32)
     TARGET := opentyrian.exe
     # The icon, from the same resource script the Visual Studio build uses.
-    WINDRES ?= windres
     RES := obj/resources.o
 endif
 
