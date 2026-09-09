@@ -24,7 +24,7 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0   # git describe --tags for the version string
       - uses: msys2/setup-msys2@v2
@@ -43,7 +43,7 @@ jobs:
           make -j"$(nproc)" debug
           ./opentyrian.exe --help
       - name: Cache game data
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: data
           key: tyrian21-data-v1
@@ -67,7 +67,7 @@ jobs:
         run: |
           mkdir -p /tmp/pkgtest && unzip -q "opentyrian-windows-${{ matrix.arch }}.zip" -d /tmp/pkgtest
           cd / && /tmp/pkgtest/opentyrian/opentyrian.exe --help
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: opentyrian-windows-${{ matrix.arch }}
           path: opentyrian-windows-${{ matrix.arch }}.zip

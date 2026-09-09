@@ -24,7 +24,7 @@ jobs:
           - { runner: ubuntu-22.04,     arch: x86_64 }
           - { runner: ubuntu-22.04-arm, arch: arm64 }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0   # git describe --tags for the version string
       - name: Install dependencies
@@ -46,12 +46,12 @@ jobs:
       - name: Smoke test
         run: ./opentyrian --help
       - name: Cache game data
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: data
           key: tyrian21-data-v1
       - name: Cache static SDL2 build
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: build/sdl
           key: sdl2-static-${{ matrix.arch }}-${{ hashFiles('make_linux.sh') }}
@@ -70,7 +70,7 @@ jobs:
         run: |
           mkdir -p pkgtest && tar -xzf "opentyrian-linux-${{ matrix.arch }}.tar.gz" -C pkgtest
           docker run --rm -v "$PWD/pkgtest:/pkg:ro" -w / debian:bookworm-slim /pkg/opentyrian/opentyrian --help
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: opentyrian-linux-${{ matrix.arch }}
           path: opentyrian-linux-${{ matrix.arch }}.tar.gz
