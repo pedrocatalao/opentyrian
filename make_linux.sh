@@ -45,13 +45,15 @@ NPROC="$(nproc 2>/dev/null || echo 4)"
 # copies inside the prefix, since that is what CI caches: on a cache hit the
 # source trees below are never unpacked.
 install_license() {  # $1 = source directory, $2 = name in the package
-    src=$(ls "$1"/LICENSE.txt "$1"/LICENSE "$1"/COPYING.txt "$1"/COPYING 2>/dev/null | head -1)
-    if [ -z "$src" ]; then
-        echo "ERROR: no licence file found in $1" >&2
-        exit 1
-    fi
     mkdir -p "$PREFIX/share/licenses"
-    cp "$src" "$PREFIX/share/licenses/$2.txt"
+    for name in LICENSE.txt LICENSE COPYING.txt COPYING; do
+        if [ -f "$1/$name" ]; then
+            cp "$1/$name" "$PREFIX/share/licenses/$2.txt"
+            return 0
+        fi
+    done
+    echo "ERROR: no licence file found in $1" >&2
+    exit 1
 }
 
 if [ ! -f "$PREFIX/lib/libSDL2.a" ]; then
